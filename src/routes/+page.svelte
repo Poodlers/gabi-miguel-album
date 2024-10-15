@@ -1,13 +1,13 @@
-<script lang="ts">
-	import AddButton from '$lib/Components/AddButton.svelte';
-	import Timeline from '$lib/Components/Timeline.svelte';
-	import type { PageData } from './$types';
-
-	export let data: PageData;
+<script>
+	import Modal from '$lib/Components/Modal.svelte';
+	import { modal } from '$lib/Data/stores';
+	import Content from './content.svelte';
+	export let data;
 	$: ({ posts } = data);
 </script>
 
-<div class="w-full flex flex-col items-center">
-	<AddButton />
-	<Timeline {posts} />
+<div class="w-full flex flex-col items-center bg-pink min-h-screen">
+	<Modal show={$modal}>
+		<Content {posts}></Content>
+	</Modal>
 </div>
