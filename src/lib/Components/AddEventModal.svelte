@@ -1,42 +1,33 @@
-<script>
+<script lang="ts">
 	import { enhance } from '$app/forms';
 	import { getContext } from 'svelte';
+	import FileUploader from './FileUploader.svelte';
+	import DatePicker from './DatePicker.svelte';
 	export let message;
 
-	export let onCancel = () => {};
-	export let onOkay = () => {};
+	const { close } = getContext<{ close: () => void }>('simple-modal');
 
-	const { close } = getContext('simple-modal');
+	let password: string = '';
+	let title: string = '';
+	let description: string = '';
+	let date: string = '';
+	let image: File;
 
-	let password = '';
-	let title = '';
-	let description = '';
-	let image = '';
 	let onChange = () => {};
 
-	function _onCancel() {
-		onCancel();
-		close();
-	}
-
-	function _onOkay() {
-		onOkay();
-		close();
-	}
-
 	$: onChange();
-
-	const authorizedFileExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 </script>
 
 <div class="w-full p-5 bg-pink">
 	<h1 class="text-center text-bordeau font-extrabold text-3xl">{message}</h1>
 	<form method="post" use:enhance enctype="multipart/form-data">
 		<div>
-			<label class="block text-gray-700 text-md font-bold mb-2" for="password">Password: </label>
+			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="password"
+				>Password:
+			</label>
 			<input
 				class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-				type="text"
+				type="password"
 				id="password"
 				name="password"
 				bind:value={password}
@@ -45,7 +36,17 @@
 		</div>
 
 		<div>
-			<label class="block text-gray-700 text-sm font-bold mb-2" for="title">Title: </label>
+			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="date">Date: </label>
+			<input type="hidden" id="date" name="date" bind:value={date} />
+			<DatePicker
+				on:datepicked={(event) => {
+					date = event.detail;
+				}}
+			/>
+		</div>
+
+		<div>
+			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="title">Title: </label>
 			<input
 				class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 				type="text"
@@ -57,7 +58,7 @@
 		</div>
 
 		<div>
-			<label class="block text-gray-700 text-sm font-bold mb-2" for="description"
+			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="description"
 				>Description:
 			</label>
 			<textarea
@@ -69,13 +70,16 @@
 		</div>
 
 		<div>
-			<label class="block text-gray-700 text-sm font-bold mb-2" for="image">Image: </label>
-			<input
-				type="file"
-				id="file"
-				name="fileToUpload"
-				accept={authorizedFileExtensions.join(',')}
-				required
+			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image">Image: </label>
+			<input type="hidden" id="image" name="image" bind:value={image} />
+			<FileUploader
+				on:change={(event) => {
+					image = event.detail[0];
+				}}
+				callback={() => {}}
+				listFiles={false}
+				maxFiles={1}
+				acceptedFileTypes="image/*"
 			/>
 		</div>
 		<div class="flex flex-col items-center justify-center">
