@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { getContext } from 'svelte';
 	import FileUploader from './FileUploader.svelte';
 	import DatePicker from './DatePicker.svelte';
+
 	export let message;
 
 	const { close } = getContext<{ close: () => void }>('simple-modal');
@@ -13,14 +13,37 @@
 	let date: string = '';
 	let image: File;
 
-	let onChange = () => {};
+	let error;
 
-	$: onChange();
+	const submitForm = async (event: any) => {
+		event.preventDefault();
+
+		const formData = new FormData();
+		formData.append('password', password);
+		formData.append('title', title);
+		formData.append('description', description);
+		formData.append('date', date);
+		formData.append('image', image ? image : '');
+
+		// Make the POST request
+		const response = await fetch('/upload', {
+			method: 'POST',
+			body: formData
+		});
+
+		const result = await response.json();
+		console.log(result);
+		error = result.message;
+		if (result.success) {
+			close();
+			window.location.reload();
+		}
+	};
 </script>
 
 <div class="w-full p-5 bg-pink">
 	<h1 class="text-center text-bordeau font-extrabold text-3xl">{message}</h1>
-	<form method="post" use:enhance enctype="multipart/form-data">
+	<form method="post" on:submit={submitForm} enctype="multipart/form-data">
 		<div>
 			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="password"
 				>Password:
@@ -71,7 +94,7 @@
 
 		<div>
 			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image">Image: </label>
-			<input type="hidden" id="image" name="image" bind:value={image} />
+			<input hidden type="file" id="image" name="image" bind:value={image} />
 			<FileUploader
 				on:change={(event) => {
 					image = event.detail[0];
@@ -84,7 +107,9 @@
 		</div>
 		<div class="flex flex-col items-center justify-center">
 			<button
-				class="mt-4 bg-bordeau text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+				class="mt-4 bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
+				hover:bg-bordeau-500 hover:text-white
+				"
 				type="submit"
 			>
 				Confirm

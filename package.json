@@ -34,7 +34,10 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@types/streamifier": "^0.1.2",
+		"cloudinary": "^2.5.1",
 		"dayjs": "^1.11.13",
-		"mongodb": "^6.9.0"
+		"mongodb": "^6.9.0",
+		"streamifier": "^0.1.1"
 	}
 }

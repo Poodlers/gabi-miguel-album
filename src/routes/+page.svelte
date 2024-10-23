@@ -2,6 +2,7 @@
 	import Modal from '$lib/Components/Modal.svelte';
 	import { modal } from '$lib/Data/stores';
 	import Content from './content.svelte';
+
 	export let data;
 	$: ({ posts } = data);
 </script>

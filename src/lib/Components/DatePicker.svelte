@@ -31,11 +31,9 @@
 	let rows = initRows();
 
 	// reactivity, on inputTxt changes
-	$: () => {
-		dispatch('datepicked', {
-			datepicked: inputTxt
-		});
-	};
+	$: {
+		dispatch('datepicked', inputTxt);
+	}
 
 	// life cycle
 	onMount(() => {

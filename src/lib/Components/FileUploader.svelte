@@ -35,7 +35,6 @@
 
 	$: files = [...inputFiles, ...dragZoneFiles];
 	$: {
-		console.log(files);
 		if (files.length >= maxFiles) {
 			imgSrc = files[0] ? URL.createObjectURL(files[0]) : '';
 			files = files.slice(0, maxFiles);
