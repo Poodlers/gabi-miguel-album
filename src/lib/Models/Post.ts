@@ -1,6 +1,8 @@
 export interface Post {
-    title: string,
-    image: string, 
-    description: string,
-    date: Date
+	_id: string;
+	public_image_id: string;
+	title: string;
+	image: string;
+	description: string;
+	date: Date;
 }

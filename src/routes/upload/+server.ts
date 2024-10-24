@@ -68,8 +68,14 @@ export const POST = async ({ request }) => {
 						)
 					);
 				} else if (result) {
+					const optimizedURL = cloudinary.url(result.public_id, {
+						quality: 'auto',
+						fetch_format: 'auto',
+						secure: true
+					});
 					posts.insertOne({
-						image: result.secure_url,
+						image: optimizedURL,
+						public_image_id: result.public_id,
 						date: date,
 						title: title,
 						description: description

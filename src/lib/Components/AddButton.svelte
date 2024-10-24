@@ -5,6 +5,8 @@
 <script>
 	import AddEventModal from './AddEventModal.svelte';
 	import { getContext } from 'svelte';
+	// @ts-ignore
+	import MdAdd from 'svelte-icons/md/MdAdd.svelte';
 	const { open } = getContext('simple-modal');
 
 	const onCancel = (/** @type {any} */ _text) => {};
@@ -29,6 +31,6 @@
 	};
 </script>
 
-<button class="bg-black mx-auto w-10 h-10" on:click={showDialog}>
-	<img class="mx-auto" src="mdi_plus.png" alt="Add Post" />
+<button class="bg-black mx-auto w-10 h-10 text-white" on:click={showDialog}>
+	<MdAdd />
 </button>
