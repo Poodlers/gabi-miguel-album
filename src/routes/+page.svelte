@@ -1,10 +1,15 @@
 <script>
 	import Modal from '$lib/Components/Modal.svelte';
-	import { modal } from '$lib/Data/stores';
+	import { modal, postsOrder } from '$lib/Data/stores';
+	import { onMount } from 'svelte';
 	import Content from './content.svelte';
 
 	export let data;
-	$: ({ posts } = data);
+	$: ({ posts, order } = data);
+
+	onMount(() => {
+		postsOrder.set(order);
+	});
 </script>
 
 <div class="w-full flex flex-col items-center bg-pink min-h-screen">

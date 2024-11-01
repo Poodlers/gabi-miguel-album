@@ -20,14 +20,14 @@
 	<button
 		class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
             
-            absolute bottom-0 left-0"
+            absolute bottom-0 left-5"
 		on:click={() => onEdit(post)}
 	>
 		<MdEdit />
 	</button>
 	<button
 		class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
-                 absolute bottom-0 right-3
+                 absolute bottom-0 right-5
             "
 		on:click={() => onDelete(post._id, post.public_image_id)}
 	>

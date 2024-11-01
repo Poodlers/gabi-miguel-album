@@ -6,20 +6,8 @@
 <script lang="ts">
 	import type { Post } from '$lib/Models/Post';
 	import { getContext } from 'svelte';
-	// @ts-ignore
-	import MdDelete from 'svelte-icons/md/MdDelete.svelte';
-	// @ts-ignore
-	import MdEdit from 'svelte-icons/md/MdEdit.svelte';
 	import AddEventModal from './AddEventModal.svelte';
-	import {
-		Timeline,
-		TimelineConnector,
-		TimelineContent,
-		TimelineDot,
-		TimelineItem,
-		TimelineOppositeContent,
-		TimelineSeparator
-	} from 'svelte-vertical-timeline';
+	import { Timeline } from 'svelte-vertical-timeline';
 	import ItemDesktop from './ItemDesktop.svelte';
 	import ItemMobile from './ItemMobile.svelte';
 
@@ -77,10 +65,7 @@
 <svelte:window bind:innerWidth />
 
 <div class="w-full">
-	<Timeline
-		position={innerWidth > 640 ? 'alternate' : 'left'}
-		style={' padding: 50px 0; border-radius: 2%;'}
-	>
+	<Timeline position={'alternate'} style={' padding: 50px 0; border-radius: 2%;'}>
 		{#each posts as post}
 			{#if innerWidth > 640}
 				<ItemDesktop {post} {onEdit} {onDelete} />
