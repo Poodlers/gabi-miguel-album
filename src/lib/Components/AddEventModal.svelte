@@ -1,33 +1,46 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import FileUploader from './FileUploader.svelte';
 	import DatePicker from './DatePicker.svelte';
+	import dayjs from 'dayjs';
 
 	export let message;
 
 	const { close } = getContext<{ close: () => void }>('simple-modal');
 
 	let password: string = '';
-	let title: string = '';
-	let description: string = '';
-	let date: string = '';
+	export let id: string = '';
+	export let title: string = '';
+	export let description: string = '';
+	export let date: string = '';
 	let image: File;
+	export let imageFromCloudinary: string;
+	let imageAltered: boolean = false;
+
+	console.log('id', id);
 
 	let error;
+
+	onMount(() => {
+		dayjs.locale('pt');
+		date = date == '' ? dayjs().format('YYYY-MM-DD') : date;
+	});
 
 	const submitForm = async (event: any) => {
 		event.preventDefault();
 
 		const formData = new FormData();
+		formData.append('id', id);
 		formData.append('password', password);
 		formData.append('title', title);
 		formData.append('description', description);
 		formData.append('date', date);
 		formData.append('image', image ? image : '');
+		formData.append('imageAltered', imageAltered ? 'true' : 'false');
 
 		// Make the POST request
 		const response = await fetch('/upload', {
-			method: 'POST',
+			method: id === '' ? 'POST' : 'PUT',
 			body: formData
 		});
 
@@ -62,6 +75,7 @@
 			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="date">Date: </label>
 			<input type="hidden" id="date" name="date" bind:value={date} />
 			<DatePicker
+				inputTxt={date}
 				on:datepicked={(event) => {
 					date = event.detail;
 				}}
@@ -96,8 +110,10 @@
 			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image">Image: </label>
 			<input hidden type="file" id="image" name="image" bind:value={image} />
 			<FileUploader
+				imgSrc={imageFromCloudinary}
 				on:change={(event) => {
 					image = event.detail[0];
+					imageAltered = true;
 				}}
 				callback={() => {}}
 				listFiles={false}

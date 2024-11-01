@@ -31,7 +31,7 @@
 	//Show a list of files + icons?
 	export let listFiles = true;
 
-	let imgSrc: string = '';
+	export let imgSrc: string = '';
 
 	$: files = [...inputFiles, ...dragZoneFiles];
 	$: {
@@ -136,6 +136,10 @@
 	role="region"
 	class={`${fixed ? 'fixed' : ''} fileUploader dragzone`}
 >
+	{#if imgSrc}
+		<img src={imgSrc} alt="Preview" />
+	{/if}
+
 	{#if files.length !== maxFiles}
 		{#if listFiles}
 			<ul>
@@ -198,7 +202,6 @@
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		{#if doneText}<span class="doneText" on:click={() => callback(files)}>{doneText}</span>{/if}
 	{:else}
-		<img src={imgSrc} alt="Preview" />
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			xmlns:xlink="http://www.w3.org/1999/xlink"

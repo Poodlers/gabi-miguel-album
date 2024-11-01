@@ -5,14 +5,50 @@
 -->
 <script lang="ts">
 	import type { Post } from '$lib/Models/Post';
+	import { getContext } from 'svelte';
 	// @ts-ignore
 	import MdDelete from 'svelte-icons/md/MdDelete.svelte';
 	// @ts-ignore
 	import MdEdit from 'svelte-icons/md/MdEdit.svelte';
+	import AddEventModal from './AddEventModal.svelte';
+	import {
+		Timeline,
+		TimelineConnector,
+		TimelineContent,
+		TimelineDot,
+		TimelineItem,
+		TimelineOppositeContent,
+		TimelineSeparator
+	} from 'svelte-vertical-timeline';
+	import ItemDesktop from './ItemDesktop.svelte';
+	import ItemMobile from './ItemMobile.svelte';
 
 	export let posts: Post[];
 
-	function onEdit() {}
+	let innerWidth: number;
+
+	function onEdit(post: Post) {
+		open(
+			AddEventModal,
+			{
+				message: 'EDITAR POST',
+				hasForm: true,
+				id: post._id,
+				title: post.title,
+				description: post.description,
+				date: post.date,
+				imageFromCloudinary: post.image,
+				onCancel,
+				onOkay
+			},
+			{
+				closeButton: true,
+				closeOnEsc: false,
+				closeOnOuterClick: true,
+				background: 'rgba(0, 0, 0, .5)'
+			}
+		);
+	}
 
 	function onDelete(postId: string, publicImageId: string) {
 		console.log(postId, publicImageId);
@@ -28,27 +64,29 @@
 			})
 			.catch((err) => console.log(err));
 	}
+
+	const { open } = getContext<{ open: (component: any, props: any, options: any) => void }>(
+		'simple-modal'
+	);
+
+	const onCancel = (_text: any) => {};
+
+	const onOkay = (_text: any) => {};
 </script>
 
-<div>
-	{#each posts as post}
-		<div class="p-4">
-			<button
-				class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded w-20 h-20"
-				on:click={onEdit}
-			>
-				<MdEdit />
-			</button>
-			<button
-				class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded w-20 h-20"
-				on:click={() => onDelete(post._id, post.public_image_id)}
-			>
-				<MdDelete />
-			</button>
-			<h2 class="text-xl font-bold">{post.title}</h2>
-			<p>{post.description}</p>
-			<img src={post.image} alt={post.title} />
-			<p>{post.date}</p>
-		</div>
-	{/each}
+<svelte:window bind:innerWidth />
+
+<div class="w-full">
+	<Timeline
+		position={innerWidth > 640 ? 'alternate' : 'left'}
+		style={' padding: 50px 0; border-radius: 2%;'}
+	>
+		{#each posts as post}
+			{#if innerWidth > 640}
+				<ItemDesktop {post} {onEdit} {onDelete} />
+			{:else}
+				<ItemMobile {post} {onEdit} {onDelete} />
+			{/if}
+		{/each}
+	</Timeline>
 </div>

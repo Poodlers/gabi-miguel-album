@@ -20,14 +20,15 @@
 	// data
 	const dispatch = createEventDispatcher();
 	let elModal: HTMLElement; // HTMLElement
-	let inputTxt: string; // string, défault date = now
+	export let inputTxt: string; // string, défault date = now
 	let isOpenCalendar: boolean = false; // true: show calendar
 	const arrDays: string[] = ['2ª', '3ª', '4ª', '5ª', '6ª', 'Sa', 'Do']; // days of week
+
 	const currentDay = +dayjs().format('D'); // 1..31
 	const currentMonth = +dayjs().format('M'); // 1..12
 	const currentYear = +dayjs().format('YYYY'); // 2021...
-	let selectedMonth = +dayjs().format('M'); // 1..12
-	let selectedYear = +dayjs().format('YYYY'); // 2021...
+	let selectedMonth = inputTxt ? +inputTxt.split('-')[1] : +dayjs().format('M'); // 1..12
+	let selectedYear = inputTxt ? +inputTxt.split('-')[0] : +dayjs().format('YYYY'); // 2021...
 	let rows = initRows();
 
 	// reactivity, on inputTxt changes
@@ -37,8 +38,7 @@
 
 	// life cycle
 	onMount(() => {
-		dayjs.locale('pt'); // use locale
-		inputTxt = dayjs().format('YYYY-MM-DD'); // current day month year in input
+		dayjs.locale('pt');
 		affecteRows();
 	});
 
