@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AddButton from '$lib/Components/AddButton.svelte';
 	import FilterMenu from '$lib/Components/FilterMenu.svelte';
+	import SearchBar from '$lib/Components/SearchBar.svelte';
 	import Timeline from '$lib/Components/Timeline.svelte';
 	import type { Post } from '$lib/Models/Post';
 
@@ -14,16 +15,17 @@
 	class=" 
 	flex
 	flex-row
-	space-between
+	justify-between
 	items-center
 	mt-4
 	mb-4
-	w-full
+	w-11/12
 
 "
 >
-	<AddButton />
 	<FilterMenu />
+	<SearchBar />
+	<AddButton />
 </div>
 
 <Timeline {posts} />

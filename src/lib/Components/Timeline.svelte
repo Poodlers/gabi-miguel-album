@@ -13,7 +13,7 @@
 
 	export let posts: Post[];
 
-	let innerWidth: number;
+	let innerWidth: number = 1000;
 
 	function onEdit(post: Post) {
 		open(

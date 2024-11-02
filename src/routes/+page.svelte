@@ -1,14 +1,16 @@
 <script>
 	import Modal from '$lib/Components/Modal.svelte';
-	import { modal, postsOrder } from '$lib/Data/stores';
+	import { beginDateStore, endDateStore, modal, postsOrder } from '$lib/Data/stores';
 	import { onMount } from 'svelte';
 	import Content from './content.svelte';
 
 	export let data;
-	$: ({ posts, order } = data);
+	$: ({ posts, order, beginDate, endDate } = data);
 
 	onMount(() => {
 		postsOrder.set(order);
+		beginDateStore.set(beginDate);
+		endDateStore.set(endDate);
 	});
 </script>
 

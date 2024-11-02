@@ -5,7 +5,6 @@ import { ObjectId } from 'mongodb';
 
 export const POST = async ({ request }) => {
 	const formData = await request.formData();
-	console.log('formData:', formData);
 
 	const image = formData.get('image');
 	const date = formData.get('date');
@@ -53,7 +52,6 @@ export const POST = async ({ request }) => {
 				folder: 'gabi'
 			},
 			function (error, result) {
-				console.log(error, result);
 				if (error) {
 					reject(
 						new Response(
@@ -78,7 +76,7 @@ export const POST = async ({ request }) => {
 					posts.insertOne({
 						image: optimizedURL,
 						public_image_id: result.public_id,
-						date: date,
+						date: date ? new Date(date.toString()) : new Date(),
 						title: title,
 						description: description
 					});
@@ -171,7 +169,6 @@ export const PUT = async ({ request }) => {
 					folder: 'gabi'
 				},
 				function (error, result) {
-					console.log(error, result);
 					if (error) {
 						reject(
 							new Response(
@@ -199,7 +196,7 @@ export const PUT = async ({ request }) => {
 								$set: {
 									image: optimizedURL,
 									public_image_id: result.public_id,
-									date: date,
+									date: new Date(date || originalPost.date),
 									title: title,
 									description: description
 								}
@@ -231,7 +228,7 @@ export const PUT = async ({ request }) => {
 			{ _id: new ObjectId(id) },
 			{
 				$set: {
-					date: date,
+					date: new Date(date || originalPost.date),
 					title: title,
 					description: description
 				}
