@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import {
 		TimelineContent,
 		TimelineDot,
@@ -11,9 +11,11 @@
 	import MdDelete from 'svelte-icons/md/MdDelete.svelte';
 	// @ts-ignore
 	import MdEdit from 'svelte-icons/md/MdEdit.svelte';
-	export let post;
+	import type { Post } from '$lib/Models/Post';
+	export let post: Post;
 	export let onEdit;
 	export let onDelete;
+	export let isNewDate;
 </script>
 
 <TimelineItem style="flex-direction: column; align-items:center;">
@@ -33,13 +35,15 @@
 	>
 		<MdDelete />
 	</button>
-	<TimelineSeparator>
-		<TimelineDot
-			style="background-color: #A6E1FA; border-radius: 5px; border-color: #603140; width: 40vw"
-		>
-			<p class="text-indigo-700 font-bold text-xl text-center w-full">{post.date}</p>
-		</TimelineDot>
-	</TimelineSeparator>
+	{#if isNewDate}
+		<TimelineSeparator>
+			<TimelineDot
+				style="background-color: #A6E1FA; border-radius: 5px; border-color: #603140; width: 40vw"
+			>
+				<p class="text-indigo-700 font-bold text-xl text-center w-full">{post.date}</p>
+			</TimelineDot>
+		</TimelineSeparator>
+	{/if}
 
 	<div>
 		<TimelineOppositeContent slot="opposite-content" style="align-content:center; ">
@@ -51,13 +55,29 @@
 
 		<TimelineContent style="align-content:center;">
 			<div class="flex items-center justify-center">
-				<img
-					src={post.image}
-					alt={post.title}
-					class="object-contain rounded-lg border-2 border-bordeau-500
-                        w-80 lg:w-96 lg:h-96 md:w-72 md:h-72
-                    "
-				/>
+				{#if post.resource_type === 'video'}
+					<video
+						src={post.image}
+						class="w-9/12 h-auto rounded-lg border border-gray-200 dark:border-gray-700"
+						controls
+					>
+						<track
+							kind="captions"
+							src="path/to/captions.vtt"
+							srclang="en"
+							label="English"
+							default
+						/>
+					</video>
+				{:else}
+					<img
+						src={post.image}
+						alt={post.title}
+						class="object-contain rounded-lg border-2 border-bordeau-500
+						w-80 lg:w-9/12 md:w-72
+					"
+					/>
+				{/if}
 			</div>
 		</TimelineContent>
 	</div>

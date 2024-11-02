@@ -8,8 +8,18 @@
 	export let posts: Post[];
 </script>
 
-<div>
+<div class="flex flex-row justify-between items-center">
+	<img
+		src="https://img1.picmix.com/output/stamp/normal/4/6/5/4/2444564_f86a6.gif"
+		alt="Logo"
+		class="w-20 h-20"
+	/>
 	<h1 class="mt-4 text-4xl font-bold text-center">Timeline do Amor</h1>
+	<img
+		src="https://img1.picmix.com/output/stamp/normal/4/6/5/4/2444564_f86a6.gif"
+		alt="Logo"
+		class="w-20 h-20"
+	/>
 </div>
 <div
 	class=" 

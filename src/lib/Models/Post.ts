@@ -5,4 +5,5 @@ export interface Post {
 	image: string;
 	description: string;
 	date: Date;
+	resource_type: string;
 }

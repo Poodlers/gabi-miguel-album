@@ -30,6 +30,7 @@
 	let maxFilesCallback = (files: any, maxFiles: number) => {};
 	//Show a list of files + icons?
 	export let listFiles = true;
+	export let fileType = 'image';
 
 	export let imgSrc: string = '';
 
@@ -136,8 +137,12 @@
 	role="region"
 	class={`${fixed ? 'fixed' : ''} fileUploader dragzone`}
 >
-	{#if imgSrc}
+	{#if imgSrc && fileType === 'image'}
 		<img src={imgSrc} alt="Preview" />
+	{:else if imgSrc && fileType === 'video'}
+		<video src={imgSrc} controls>
+			<track kind="captions" src="path/to/captions.vtt" srclang="en" label="English" default />
+		</video>
 	{/if}
 
 	{#if files.length !== maxFiles}

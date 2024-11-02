@@ -14,6 +14,7 @@
 	export let posts: Post[];
 
 	let innerWidth: number = 1000;
+	let isNewDate: boolean = false;
 
 	function onEdit(post: Post) {
 		open(
@@ -21,6 +22,7 @@
 			{
 				message: 'EDITAR POST',
 				hasForm: true,
+				fileTypeFromCloudinary: post.resource_type,
 				id: post._id,
 				title: post.title,
 				description: post.description,
@@ -66,11 +68,21 @@
 
 <div class="w-full">
 	<Timeline position={'alternate'} style={' padding: 50px 0; border-radius: 2%;'}>
-		{#each posts as post}
+		{#each posts as post, index}
 			{#if innerWidth > 640}
-				<ItemDesktop {post} {onEdit} {onDelete} />
+				<ItemDesktop
+					{post}
+					{onEdit}
+					{onDelete}
+					isNewDate={index > 0 ? post.date != posts[index - 1].date : true}
+				/>
 			{:else}
-				<ItemMobile {post} {onEdit} {onDelete} />
+				<ItemMobile
+					{post}
+					{onEdit}
+					{onDelete}
+					isNewDate={index > 0 ? post.date != posts[index - 1].date : true}
+				/>
 			{/if}
 		{/each}
 	</Timeline>

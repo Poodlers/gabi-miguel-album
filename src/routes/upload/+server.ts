@@ -49,7 +49,9 @@ export const POST = async ({ request }) => {
 	return await new Promise((resolve, reject) => {
 		const cld_upload_stream = cloudinary.uploader.upload_stream(
 			{
-				folder: 'gabi'
+				folder: 'gabi',
+				resource_type: 'auto',
+				overwrite: true
 			},
 			function (error, result) {
 				if (error) {
@@ -68,13 +70,17 @@ export const POST = async ({ request }) => {
 						)
 					);
 				} else if (result) {
-					const optimizedURL = cloudinary.url(result.public_id, {
-						quality: 'auto',
-						fetch_format: 'auto',
-						secure: true
-					});
+					const optimizedURL =
+						result.resource_type == 'video'
+							? result.secure_url
+							: cloudinary.url(result.public_id, {
+									quality: 'auto',
+									fetch_format: 'auto',
+									secure: true
+								});
 					posts.insertOne({
 						image: optimizedURL,
+						resource_type: result.resource_type,
 						public_image_id: result.public_id,
 						date: date ? new Date(date.toString()) : new Date(),
 						title: title,
@@ -166,8 +172,11 @@ export const PUT = async ({ request }) => {
 		return await new Promise((resolve, reject) => {
 			const cld_upload_stream = cloudinary.uploader.upload_stream(
 				{
-					folder: 'gabi'
+					folder: 'gabi',
+					resource_type: 'auto',
+					overwrite: true
 				},
+
 				function (error, result) {
 					if (error) {
 						reject(
@@ -185,16 +194,20 @@ export const PUT = async ({ request }) => {
 							)
 						);
 					} else if (result) {
-						const optimizedURL = cloudinary.url(result.public_id, {
-							quality: 'auto',
-							fetch_format: 'auto',
-							secure: true
-						});
+						const optimizedURL =
+							result.resource_type == 'video'
+								? result.secure_url
+								: cloudinary.url(result.public_id, {
+										quality: 'auto',
+										fetch_format: 'auto',
+										secure: true
+									});
 						posts.updateOne(
 							{ _id: new ObjectId(id) },
 							{
 								$set: {
 									image: optimizedURL,
+									resource_type: result.resource_type,
 									public_image_id: result.public_id,
 									date: new Date(date || originalPost.date),
 									title: title,

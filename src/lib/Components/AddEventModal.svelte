@@ -15,6 +15,7 @@
 	export let date: string = '';
 	let image: File;
 	export let imageFromCloudinary: string;
+	export let fileTypeFromCloudinary: string;
 	let imageAltered: boolean = false;
 
 	console.log('id', id);
@@ -107,9 +108,12 @@
 		</div>
 
 		<div>
-			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image">Image: </label>
+			<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image"
+				>Image/Video:
+			</label>
 			<input hidden type="file" id="image" name="image" bind:value={image} />
 			<FileUploader
+				fileType={fileTypeFromCloudinary}
 				imgSrc={imageFromCloudinary}
 				on:change={(event) => {
 					image = event.detail[0];
@@ -118,7 +122,7 @@
 				callback={() => {}}
 				listFiles={false}
 				maxFiles={1}
-				acceptedFileTypes="image/*"
+				acceptedFileTypes="image/*, video/*"
 			/>
 		</div>
 		<div class="flex flex-col items-center justify-center">

@@ -27,18 +27,19 @@ export const load = (async ({
 			]
 		})
 		.map((doc) => {
-			const { _id, date, title, description, image } = doc;
+			const { _id, date, title, description, image, resource_type } = doc;
 
 			return {
 				_id,
 				date: date.toISOString().split('T')[0],
 				title,
 				description,
-				image
+				image,
+				resource_type
 			};
 		})
 		.toArray();
 	const dataCleaned = JSON.parse(JSON.stringify(data));
-
+	console.log('dataCleaned:', dataCleaned);
 	return { posts: dataCleaned, order: order, beginDate: beginDate, endDate: endDate };
 }) as PageServerLoad;
