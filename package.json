@@ -26,6 +26,7 @@
 		"prettier": "^3.3.2",
 		"prettier-plugin-svelte": "^3.2.5",
 		"svelte": "^4.2.7",
+		"svelte-carousel": "^1.0.25",
 		"svelte-check": "^4.0.0",
 		"tailwindcss": "^3.4.9",
 		"typescript": "^5.0.0",
@@ -40,6 +41,7 @@
 		"mongodb": "^6.9.0",
 		"streamifier": "^0.1.1",
 		"svelte-icons": "^2.1.0",
+		"svelte-steps": "^2.4.1",
 		"svelte-vertical-timeline": "^1.0.2"
 	}
 }

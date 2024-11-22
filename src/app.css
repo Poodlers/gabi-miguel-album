@@ -25,3 +25,17 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #D7554A !important;
 }
+
+.window{
+  width: 100% !important;
+  
+}
+
+@media (max-width: 768px) {
+  .steps__label {
+    display: none;
+  }
+    
+  
+}
+

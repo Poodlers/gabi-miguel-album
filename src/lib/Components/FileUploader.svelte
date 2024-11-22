@@ -21,6 +21,14 @@
 	export const getFiles = () => files;
 	// Called when maxuploads is reached or the done button is clicked
 	export let callback = (files?: any[]) => {};
+	// Tiny slider
+
+	import MdArrowBack from 'svelte-icons/md/MdArrowBack.svelte';
+	import MdArrowForward from 'svelte-icons/md/MdArrowForward.svelte';
+
+	import Carousel from 'svelte-carousel';
+
+	let carousel: any; // for calling methods of the carousel instance
 
 	// Drag zone element
 	let dragZone: HTMLDivElement;
@@ -30,22 +38,27 @@
 	let maxFilesCallback = (files: any, maxFiles: number) => {};
 	//Show a list of files + icons?
 	export let listFiles = true;
-	export let fileType = 'image';
 
-	export let imgSrc: string = '';
+	export let contentFromCloudinary: { public_image_id: string; resource_type: string }[];
 
 	$: files = [...inputFiles, ...dragZoneFiles];
 	$: {
 		if (files.length >= maxFiles) {
-			imgSrc = files[0] ? URL.createObjectURL(files[0]) : '';
-			files = files.slice(0, maxFiles);
 			maxFilesCallback(files, maxFiles);
 			dispatch('change', files);
 			callback(files);
 		}
+		if (files.length > 0) {
+			const buttons = document.querySelectorAll('.fileUploader button');
+			console.log(buttons);
+			buttons.forEach((button) => {
+				button.setAttribute('type', 'button');
+			});
+		}
 	}
 
 	import { createEventDispatcher } from 'svelte';
+	import CustomCarouselArrow from './CustomCarouselArrow.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -67,15 +80,13 @@
 		e.preventDefault();
 		dragZone.classList.remove('dragging');
 		dragZoneFiles.push(
-			...[...e.dataTransfer!.items].filter((i) => i.kind === 'file').map((i) => i.getAsFile())
+			...[...e.dataTransfer!.items]
+				.filter((i) => i.kind === 'file')
+				.map((i) => i.getAsFile())
+				.filter((f) => f && f.type && f.type.match(acceptedFileTypes))
+				.map((f) => ({ file: f, type: f!.type, src: URL.createObjectURL(f!) }))
 		);
 		dragZoneFiles = [...dragZoneFiles];
-		for (const file of dragZoneFiles) {
-			if (file.type && !file.type.match(acceptedFileTypes)) {
-				dragZoneFiles = dragZoneFiles.filter((f) => f !== file);
-				return;
-			}
-		}
 		dispatch('drop', e);
 		dispatch('change', files);
 	}
@@ -98,9 +109,15 @@
 		);
 	}
 	function inputChanged() {
-		inputFiles = [...inputFiles, ...input.files!];
+		const filesFromInput = [...input.files!];
+
+		let customFiles = [];
+		for (const file of filesFromInput) {
+			customFiles.push({ file, type: file.type, src: URL.createObjectURL(file) });
+		}
+		inputFiles = [...inputFiles, ...customFiles];
 	}
-	function del(file: File) {
+	function del(file: any) {
 		const idxInputFiles = idx(file, inputFiles);
 		const idxDragZoneFiles = idx(file, dragZoneFiles);
 		if (idxInputFiles !== null) {
@@ -137,48 +154,46 @@
 	role="region"
 	class={`${fixed ? 'fixed' : ''} fileUploader dragzone`}
 >
-	{#if imgSrc && fileType === 'image'}
-		<img src={imgSrc} alt="Preview" />
-	{:else if imgSrc && fileType === 'video'}
-		<video src={imgSrc} controls>
-			<track kind="captions" src="path/to/captions.vtt" srclang="en" label="English" default />
-		</video>
-	{/if}
-
 	{#if files.length !== maxFiles}
-		{#if listFiles}
-			<ul>
-				{#each files.slice(0, maxFiles) as file}
-					<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<li on:click={() => openFile(file)}>
-						<span class="icon">
-							<span class="fileicon">{@html getIcon(file.name)}</span>
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<!-- svelte-ignore a11y-no-static-element-interactions -->
-							<span class="deleteicon" on:click|stopPropagation={() => del(file)}
-								><svg
-									xmlns="http://www.w3.org/2000/svg"
-									xmlns:xlink="http://www.w3.org/1999/xlink"
-									aria-hidden="true"
-									role="img"
-									class="iconify iconify--ph"
-									width="32"
-									height="32"
-									preserveAspectRatio="xMidYMid meet"
-									viewBox="0 0 256 256"
-									><path
-										fill="currentColor"
-										d="M216 48h-40v-8a24.1 24.1 0 0 0-24-24h-48a24.1 24.1 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16ZM96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Zm48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Z"
-									></path></svg
-								></span
-							>
-						</span>
-						<span class="filename">{file.name}</span>
-						<span class="filesize">{formatBytes(file.size)}</span>
-					</li>
-				{/each}
-			</ul>
+		{#if listFiles && files.length > 0}
+			{#key files}
+				<Carousel bind:this={carousel}>
+					{#each files.slice(0, maxFiles) as file}
+						{#if file.type.match('image')}
+							<img
+								src={file.src}
+								alt={file.file.name}
+								style="width: 100%; height: auto; border-radius: 6px;"
+							/>
+						{:else if file.type.match('video')}
+							<video src={file.src} controls style="width: 100%; height: auto; border-radius: 6px;">
+								<track kind="captions" src="captions.vtt" srclang="en" label="English" />
+							</video>
+						{:else}
+							<div style="display: flex; align-items: center;">
+								<div class="icon">
+									<img
+										src={getIcon(file.file.name)}
+										alt={file.file.name}
+										style="width: 20px; height: 20px;"
+									/>
+								</div>
+								<span>{file.file.name}</span>
+							</div>
+						{/if}
+					{/each}
+					<div slot="prev" let:showPrevPage style="display:flex;">
+						<div class="sc-carousel__arrow-container">
+							<CustomCarouselArrow direction="PREV" on:click={showPrevPage} />
+						</div>
+					</div>
+					<div slot="next" let:showNextPage style="display:flex;">
+						<div class="sc-carousel__arrow-container">
+							<CustomCarouselArrow direction="NEXT" on:click={showNextPage} />
+						</div>
+					</div>
+				</Carousel>
+			{/key}
 		{/if}
 		<div class="buttons">
 			<button type="button" on:click={trigger} class="upload">
@@ -248,75 +263,9 @@
 		flex-direction: column;
 		transition: background-color 0.3s ease;
 	}
-	.dragzone ul {
-		width: 60%;
-		display: flex;
-		flex-direction: column;
-	}
-	.dragzone li {
-		transition: background-color 0.2s ease-in-out;
-		list-style: none;
-		display: flex;
-		align-items: center;
-		cursor: pointer;
-		padding: 3px 8px;
-		border-radius: 3px;
-	}
-	.dragzone li:hover {
-		background: #0001;
-	}
-	.dragzone .filesize {
-		flex: 1;
-		text-align: right;
-		opacity: 0.2;
-		font-style: italic;
-	}
-	.dragzone li .filename {
-		white-space: nowrap;
-		overflow: hidden;
-		width: 15ch;
-		text-overflow: ellipsis;
-		display: block;
-		font-weight: 200;
-		opacity: 0.8;
-	}
+
 	.dragzone.dragging {
 		background: #0662;
-	}
-	.dragzone svg:not(li svg) {
-		width: 6vw;
-		height: 6vw;
-		color: #777;
-		opacity: 0.6;
-	}
-	.dragzone li .icon {
-		width: 20px;
-		margin-right: 10px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-	.dragzone li .icon :global(svg) {
-		width: 20px;
-		color: #333;
-	}
-	.deleteicon {
-		display: none;
-	}
-	.dragzone li:hover .fileicon {
-		display: none;
-	}
-	.dragzone li:hover .deleteicon {
-		display: block;
-		cursor: pointer;
-	}
-	.dragzone .doneText {
-		font-size: 1.3rem;
-		color: #333;
-		opacity: 0.5;
-		font-weight: 200;
-		font-style: italic;
-		margin-top: 2rem;
 	}
 	.dragzone.fixed {
 		position: fixed;
@@ -335,6 +284,13 @@
 	.buttons {
 		width: 40%;
 		display: flex;
+	}
+	.sc-carousel__arrow-container {
+		padding: 5px;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 	.buttons button {
 		margin: 0 5px;
