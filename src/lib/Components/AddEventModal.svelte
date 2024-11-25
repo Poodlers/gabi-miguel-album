@@ -8,6 +8,7 @@
 	import MdArrowForward from 'svelte-icons/md/MdArrowForward.svelte';
 	import MdArrowBack from 'svelte-icons/md/MdArrowBack.svelte';
 	import MdDone from 'svelte-icons/md/MdDone.svelte';
+	import CarouselCustom from './CarouselCustom.svelte';
 	let steps = [
 		{ text: 'Passo 1: Insere a password' },
 		{ text: 'Passo 2: Insere o autor' },
@@ -17,25 +18,28 @@
 	];
 
 	export let message;
+	import { files } from '$lib/Data/stores';
 
 	const { close } = getContext<{ close: () => void }>('simple-modal');
 
 	let password: string = '';
 	export let id: string = '';
 	export let author: string = 'Gabi';
-
+	export let originalPostContent: {
+		public_image_id: string;
+		resource_type: string;
+		image: string;
+	}[];
 	let clientWidth: number = 0;
 
 	export let title: string = '';
 	export let description: string = '';
 	export let date: string = '';
-	let image: File;
-	export let imageFromCloudinary: string;
-	export let fileTypeFromCloudinary: string;
+	console.log($files);
 	let imageAltered: boolean = false;
 
 	let error: string = '';
-	let step = 1;
+	let step = 4;
 
 	// Progress to the next step
 	const nextStep = () => {
@@ -85,8 +89,17 @@
 		formData.append('author', author);
 		formData.append('description', description);
 		formData.append('date', date);
-		formData.append('image', image ? image : '');
-		formData.append('imageAltered', imageAltered ? 'true' : 'false');
+
+		$files.forEach((file, index) => {
+			if (file.file === null) return;
+			const newFile = new File([file.file!], `${index}_${file.file?.name}`, {
+				type: file.file?.type
+			});
+			file.name = newFile.name;
+			formData.append('files', newFile);
+		});
+		formData.append('newFilesInfo', JSON.stringify($files));
+		formData.append('originalFiles', JSON.stringify(originalPostContent));
 
 		// Make the POST request
 		const response = await fetch('/upload', {
@@ -208,18 +221,20 @@
 					<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image"
 						>Image/Video:
 					</label>
-					<input hidden type="file" id="image" name="image" bind:value={image} />
-					<FileUploader
-						contentFromCloudinary={[]}
-						on:change={(event) => {
-							image = event.detail[0];
-							imageAltered = true;
-						}}
-						callback={() => {}}
-						listFiles={true}
-						maxFiles={3}
-						acceptedFileTypes="image/*, video/*"
-					/>
+
+					{#if $files.length > 0}
+						<CarouselCustom
+							edit={true}
+							on:delete={(event) => {
+								console.log(event.detail);
+								$files = $files.filter((f) => f.src !== event.detail);
+								console.log($files);
+							}}
+							files={$files.map((f) => ({ src: f.src, type: f.type, name: f.src }))}
+						/>
+					{/if}
+
+					<FileUploader callback={() => {}} acceptedFileTypes="image/*, video/*" />
 				</div>
 			{/if}
 			{#if error}

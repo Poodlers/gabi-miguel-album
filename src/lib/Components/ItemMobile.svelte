@@ -12,6 +12,7 @@
 	// @ts-ignore
 	import MdEdit from 'svelte-icons/md/MdEdit.svelte';
 	import type { Post } from '$lib/Models/Post';
+	import CarouselCustom from './CarouselCustom.svelte';
 	export let post: Post;
 	export let onEdit;
 	export let onDelete;
@@ -22,16 +23,16 @@
 	<button
 		class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
             
-            absolute bottom-0 left-5"
+            absolute bottom-0 left-5 z-10"
 		on:click={() => onEdit(post)}
 	>
 		<MdEdit />
 	</button>
 	<button
 		class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
-                 absolute bottom-0 right-5
+                 absolute bottom-0 right-5 z-10
             "
-		on:click={() => onDelete(post._id, post.public_image_id)}
+		on:click={() => onDelete(post._id, post.content)}
 	>
 		<MdDelete />
 	</button>
@@ -47,37 +48,29 @@
 
 	<div>
 		<TimelineOppositeContent slot="opposite-content" style="align-content:center; ">
-			<div class="w-screen lg:max-w-sm md:max-w-72">
-				<h2 class="text-center text-xl font-bold">{post.title}</h2>
-				<p class="text-left break-words px-4">{post.description}</p>
+			<div class="flex items-center justify-center w-screen">
+				<CarouselCustom
+					files={post.content.map((f) => ({
+						src: f.image,
+						type: f.resource_type,
+						name: f.public_image_id
+					}))}
+				/>
 			</div>
 		</TimelineOppositeContent>
 
 		<TimelineContent style="align-content:center;">
-			<div class="flex items-center justify-center">
-				{#if post.resource_type === 'video'}
-					<video
-						src={post.image}
-						class="w-9/12 h-auto rounded-lg border border-gray-200 dark:border-gray-700"
-						controls
-					>
-						<track
-							kind="captions"
-							src="path/to/captions.vtt"
-							srclang="en"
-							label="English"
-							default
-						/>
-					</video>
-				{:else}
+			<div class="w-screen lg:max-w-sm md:max-w-72 flex flex-col">
+				<h2 class="text-center text-2xl font-bold">{post.title}</h2>
+				<p class="text-left break-words px-4">{post.description}</p>
+				<div class="flex flex-row justify-center items-center mt-auto space-x-4">
+					<p class="text-xl font-bold">Postado por {post.author}</p>
 					<img
-						src={post.image}
-						alt={post.title}
-						class="object-contain rounded-lg border-2 border-bordeau-500
-						w-80 lg:w-9/12 md:w-72
-					"
+						src={post.author == 'Gabi' ? 'gabiii.jpg' : 'miguel_foto.jpeg'}
+						alt="author"
+						class="w-10 h-10 rounded-full"
 					/>
-				{/if}
+				</div>
 			</div>
 		</TimelineContent>
 	</div>

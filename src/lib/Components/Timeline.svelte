@@ -10,6 +10,7 @@
 	import { Timeline } from 'svelte-vertical-timeline';
 	import ItemDesktop from './ItemDesktop.svelte';
 	import ItemMobile from './ItemMobile.svelte';
+	import { files } from '$lib/Data/stores';
 
 	export let posts: Post[];
 
@@ -17,17 +18,22 @@
 	let isNewDate: boolean = false;
 
 	function onEdit(post: Post) {
+		$files = post.content.map((content) => ({
+			file: null,
+			src: content.image,
+			type: content.resource_type
+		}));
 		open(
 			AddEventModal,
 			{
 				message: 'EDITAR POST',
 				hasForm: true,
-				fileTypeFromCloudinary: post.resource_type,
+				originalPostContent: post.content,
 				id: post._id,
 				title: post.title,
 				description: post.description,
 				date: post.date,
-				imageFromCloudinary: post.image,
+				author: post.author,
 				onCancel,
 				onOkay
 			},
@@ -40,10 +46,14 @@
 		);
 	}
 
-	function onDelete(postId: string, publicImageId: string) {
-		console.log(postId, publicImageId);
-		fetch(`/delete?post=${postId}&public_image_id=${publicImageId}`, {
-			method: 'DELETE'
+	function onDelete(postId: string, public_image_ids: string[]) {
+		console.log(postId, public_image_ids);
+		fetch(`/delete?post=${postId}`, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ public_image_ids })
 		})
 			.then((res) => res.json())
 			.then((data) => {

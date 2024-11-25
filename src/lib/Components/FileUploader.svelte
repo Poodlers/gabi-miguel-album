@@ -12,9 +12,7 @@
 	let input: HTMLInputElement;
 	//Fixed uploader position?
 	let fixed = false;
-	//Files from the file input and the drag zone
-	let inputFiles: any[] = [];
-	let dragZoneFiles: any[] = [];
+
 	//Trigger file upload
 	let trigger = () => input.click();
 	//External method to get the current files at any time
@@ -23,42 +21,22 @@
 	export let callback = (files?: any[]) => {};
 	// Tiny slider
 
-	import MdArrowBack from 'svelte-icons/md/MdArrowBack.svelte';
-	import MdArrowForward from 'svelte-icons/md/MdArrowForward.svelte';
-
-	import Carousel from 'svelte-carousel';
-
-	let carousel: any; // for calling methods of the carousel instance
-
 	// Drag zone element
 	let dragZone: HTMLDivElement;
 	//Maximum files that can be uploaded
 	export let maxFiles = 3;
 	// When the maximum files are uploaded
 	let maxFilesCallback = (files: any, maxFiles: number) => {};
-	//Show a list of files + icons?
-	export let listFiles = true;
 
-	export let contentFromCloudinary: { public_image_id: string; resource_type: string }[];
-
-	$: files = [...inputFiles, ...dragZoneFiles];
+	import { files } from '$lib/Data/stores.js';
 	$: {
-		if (files.length >= maxFiles) {
-			maxFilesCallback(files, maxFiles);
-			dispatch('change', files);
-			callback(files);
-		}
-		if (files.length > 0) {
-			const buttons = document.querySelectorAll('.fileUploader button');
-			console.log(buttons);
-			buttons.forEach((button) => {
-				button.setAttribute('type', 'button');
-			});
+		if ($files.length >= maxFiles) {
+			maxFilesCallback($files, maxFiles);
+			callback($files);
 		}
 	}
 
 	import { createEventDispatcher } from 'svelte';
-	import CustomCarouselArrow from './CustomCarouselArrow.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -79,16 +57,16 @@
 	function drop(e: DragEvent) {
 		e.preventDefault();
 		dragZone.classList.remove('dragging');
-		dragZoneFiles.push(
+		$files.push(
 			...[...e.dataTransfer!.items]
 				.filter((i) => i.kind === 'file')
 				.map((i) => i.getAsFile())
 				.filter((f) => f && f.type && f.type.match(acceptedFileTypes))
 				.map((f) => ({ file: f, type: f!.type, src: URL.createObjectURL(f!) }))
 		);
-		dragZoneFiles = [...dragZoneFiles];
+		$files = [...$files];
 		dispatch('drop', e);
-		dispatch('change', files);
+		dispatch('change', $files);
 	}
 	function formatBytes(a: number, b = 2, k = 1024) {
 		let d = Math.floor(Math.log(a) / Math.log(k));
@@ -115,22 +93,17 @@
 		for (const file of filesFromInput) {
 			customFiles.push({ file, type: file.type, src: URL.createObjectURL(file) });
 		}
-		inputFiles = [...inputFiles, ...customFiles];
+		$files = [...$files, ...customFiles];
 	}
 	function del(file: any) {
-		const idxInputFiles = idx(file, inputFiles);
-		const idxDragZoneFiles = idx(file, dragZoneFiles);
-		if (idxInputFiles !== null) {
-			inputFiles.splice(idxInputFiles, 1);
-			inputFiles = [...inputFiles];
+		const idxFiles = idx(file, $files);
+		if (idxFiles !== null) {
+			$files.splice(idxFiles, 1);
+			$files = [...$files];
 			return;
 		}
-		if (idxDragZoneFiles !== null) {
-			dragZoneFiles.splice(idxDragZoneFiles, 1);
-			dragZoneFiles = [...dragZoneFiles];
-			return;
-		}
-		return console.log(idx(file, inputFiles), idx(file, dragZoneFiles));
+
+		return console.log(idx(file, $files));
 		function idx(item: any, arr: any[]) {
 			let i = arr.findIndex((i) => i === item);
 			if (i < 0) {
@@ -154,47 +127,7 @@
 	role="region"
 	class={`${fixed ? 'fixed' : ''} fileUploader dragzone`}
 >
-	{#if files.length !== maxFiles}
-		{#if listFiles && files.length > 0}
-			{#key files}
-				<Carousel bind:this={carousel}>
-					{#each files.slice(0, maxFiles) as file}
-						{#if file.type.match('image')}
-							<img
-								src={file.src}
-								alt={file.file.name}
-								style="width: 100%; height: auto; border-radius: 6px;"
-							/>
-						{:else if file.type.match('video')}
-							<video src={file.src} controls style="width: 100%; height: auto; border-radius: 6px;">
-								<track kind="captions" src="captions.vtt" srclang="en" label="English" />
-							</video>
-						{:else}
-							<div style="display: flex; align-items: center;">
-								<div class="icon">
-									<img
-										src={getIcon(file.file.name)}
-										alt={file.file.name}
-										style="width: 20px; height: 20px;"
-									/>
-								</div>
-								<span>{file.file.name}</span>
-							</div>
-						{/if}
-					{/each}
-					<div slot="prev" let:showPrevPage style="display:flex;">
-						<div class="sc-carousel__arrow-container">
-							<CustomCarouselArrow direction="PREV" on:click={showPrevPage} />
-						</div>
-					</div>
-					<div slot="next" let:showNextPage style="display:flex;">
-						<div class="sc-carousel__arrow-container">
-							<CustomCarouselArrow direction="NEXT" on:click={showNextPage} />
-						</div>
-					</div>
-				</Carousel>
-			{/key}
-		{/if}
+	{#if $files.length !== maxFiles}
 		<div class="buttons">
 			<button type="button" on:click={trigger} class="upload">
 				{buttonText}
@@ -220,7 +153,7 @@
 		>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		{#if doneText}<span class="doneText" on:click={() => callback(files)}>{doneText}</span>{/if}
+		{#if doneText}<span class="doneText" on:click={() => callback($files)}>{doneText}</span>{/if}
 	{:else}
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -239,7 +172,7 @@
 		>
 		{#if doneText}<span class="doneText">{doneText}</span>{/if}
 		<div class="buttons">
-			<button type="button" on:click={() => del(files[0])} class="upload"> Delete </button>
+			<button type="button" on:click={() => del($files[0])} class="upload"> Delete </button>
 		</div>
 	{/if}
 </div>
@@ -285,13 +218,7 @@
 		width: 40%;
 		display: flex;
 	}
-	.sc-carousel__arrow-container {
-		padding: 5px;
-		box-sizing: border-box;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
+
 	.buttons button {
 		margin: 0 5px;
 		transition: background-color 0.2s ease;

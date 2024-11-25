@@ -2,11 +2,13 @@ import { v2 as cloudinary } from 'cloudinary';
 import { posts } from '$db/posts';
 import { ObjectId } from 'mongodb';
 
-export const DELETE = async ({ url }) => {
+export const DELETE = async ({ url, request }) => {
 	const id = url.searchParams.get('post');
 
-	const public_image_id = url.searchParams.get('public_image_id');
-
+	const data = await request.json();
+	const public_image_ids = data.public_image_ids;
+	// Log the data or use it in your application logic
+	console.log(data);
 	if (!id) {
 		return new Response(
 			JSON.stringify({
@@ -40,8 +42,8 @@ export const DELETE = async ({ url }) => {
 		}
 	});
 
-	if (public_image_id && public_image_id !== 'undefined') {
-		const result = await cloudinary.uploader.destroy(public_image_id);
+	public_image_ids.forEach(async (data: any) => {
+		const result = await cloudinary.uploader.destroy(data.public_image_id);
 		console.log(result);
 		if (result.result === 'not found') {
 			return new Response(
@@ -57,7 +59,7 @@ export const DELETE = async ({ url }) => {
 				}
 			);
 		}
-	}
+	});
 
 	return new Response(
 		JSON.stringify({
