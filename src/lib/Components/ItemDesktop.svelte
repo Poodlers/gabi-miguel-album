@@ -7,6 +7,7 @@
 		TimelineOppositeContent,
 		TimelineSeparator
 	} from 'svelte-vertical-timeline';
+	import { userStore } from '$lib/Data/stores';
 	// @ts-ignore
 	import MdDelete from 'svelte-icons/md/MdDelete.svelte';
 	// @ts-ignore
@@ -22,21 +23,23 @@
 </script>
 
 <TimelineItem>
-	<button
-		class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
-            absolute bottom-0 left-3"
-		on:click={() => onEdit(post)}
-	>
-		<MdEdit />
-	</button>
-	<button
-		class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
+	{#if $userStore}
+		<button
+			class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
+            absolute bottom-0 left-3 z-10"
+			on:click={() => onEdit(post)}
+		>
+			<MdEdit />
+		</button>
+		<button
+			class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
                  absolute bottom-0 right-3 z-10
             "
-		on:click={() => onDelete(post._id, post.content)}
-	>
-		<MdDelete />
-	</button>
+			on:click={() => onDelete(post._id, post.content)}
+		>
+			<MdDelete />
+		</button>
+	{/if}
 	<TimelineSeparator>
 		{#if isNewDate}
 			<TimelineDot
@@ -50,7 +53,7 @@
 	</TimelineSeparator>
 
 	<TimelineOppositeContent slot="opposite-content" style="align-content:center;  ">
-		<div class="w-screen lg:max-w-md md:max-w-72 min-h-48 flex flex-col">
+		<div class="w-screen lg:w-md lg:max-w-md md:max-w-72 min-h-48 flex flex-col">
 			<h2 class="text-center text-2xl font-bold">{post.title}</h2>
 
 			<p class="text-left break-words px-4">{post.description}</p>
@@ -61,12 +64,19 @@
 					alt="author"
 					class="w-10 h-10 rounded-full"
 				/>
+				<button
+					class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-3 rounded"
+					on:click={() => {
+						window.location.href = `/${post._id}`;
+					}}
+					>Ver mais
+				</button>
 			</div>
 		</div></TimelineOppositeContent
 	>
 
 	<TimelineContent style="align-content:center;">
-		<div class="flex items-center justify-center w-screen lg:max-w-2xl md:max-w-96">
+		<div class="flex items-center justify-center w-screen lg:max-w-xl md:max-w-96">
 			<CarouselCustom
 				files={post.content.map((f) => ({
 					src: f.image,

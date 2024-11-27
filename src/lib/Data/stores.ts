@@ -5,6 +5,8 @@ export const postsOrder = writable('1');
 export const beginDateStore = writable('');
 export const endDateStore = writable('');
 
+export const userStore = writable('');
+
 export const files = writable<
 	{
 		file: File | null;

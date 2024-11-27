@@ -1,10 +1,11 @@
 <script lang="ts">
 	import AddButton from '$lib/Components/AddButton.svelte';
 	import FilterMenu from '$lib/Components/FilterMenu.svelte';
+	import LoginButton from '$lib/Components/LoginButton.svelte';
 	import SearchBar from '$lib/Components/SearchBar.svelte';
 	import Timeline from '$lib/Components/Timeline.svelte';
 	import type { Post } from '$lib/Models/Post';
-
+	import { userStore } from '$lib/Data/stores';
 	export let posts: Post[];
 </script>
 
@@ -35,7 +36,11 @@
 >
 	<FilterMenu />
 	<SearchBar />
-	<AddButton />
+	{#if $userStore}
+		<AddButton />
+	{/if}
+
+	<LoginButton />
 </div>
 
 <Timeline {posts} />

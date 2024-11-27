@@ -4,11 +4,19 @@ import type { Post } from '$lib/Models/Post';
 
 export const load = (async ({
 	cookies
-}): Promise<{ posts: Post[]; order: string; beginDate: string; endDate: string }> => {
+}): Promise<{
+	posts: Post[];
+	order: string;
+	beginDate: string;
+	endDate: string;
+	user: string | undefined;
+}> => {
 	const order = cookies.get('order') || '1';
 	const beginDate = cookies.get('beginDate') || '2024-01-01';
 	const endDate = cookies.get('endDate') || new Date().toISOString().split('T')[0];
 	const searchQuery = cookies.get('search') || '';
+	const user = cookies.get('user');
+
 	cookies.delete('search', {
 		path: '/',
 		httpOnly: true
@@ -41,5 +49,5 @@ export const load = (async ({
 		.toArray();
 	const dataCleaned = JSON.parse(JSON.stringify(data));
 
-	return { posts: dataCleaned, order: order, beginDate: beginDate, endDate: endDate };
+	return { posts: dataCleaned, order: order, beginDate: beginDate, endDate: endDate, user: user };
 }) as PageServerLoad;

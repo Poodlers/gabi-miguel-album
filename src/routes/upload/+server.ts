@@ -80,7 +80,8 @@ export const POST = async ({ request }) => {
 		date: date ? new Date(date.toString()) : new Date(),
 		title: title,
 		description: description,
-		author: author
+		author: author,
+		comments: []
 	});
 	return new Response(
 		JSON.stringify({

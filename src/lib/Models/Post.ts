@@ -1,3 +1,5 @@
+import type { Comment } from './comment';
+
 export interface Post {
 	_id: string;
 	title: string;
@@ -5,4 +7,5 @@ export interface Post {
 	date: Date;
 	content: { public_image_id: string; resource_type: string; image: string }[];
 	author?: string;
+	comments?: Comment[];
 }

@@ -10,21 +10,18 @@
 	import MdDone from 'svelte-icons/md/MdDone.svelte';
 	import CarouselCustom from './CarouselCustom.svelte';
 	let steps = [
-		{ text: 'Passo 1: Insere a password' },
-		{ text: 'Passo 2: Insere o autor' },
 		{ text: 'Passo 3: Insere a data' },
 		{ text: 'Passo 4: Insere o título e descrição' },
 		{ text: 'Passo 5: Insere imagens/vídeos' }
 	];
 
 	export let message;
-	import { files } from '$lib/Data/stores';
+	import { files, userStore } from '$lib/Data/stores';
 
 	const { close } = getContext<{ close: () => void }>('simple-modal');
 
-	let password: string = '';
 	export let id: string = '';
-	export let author: string = 'Gabi';
+
 	export let originalPostContent: {
 		public_image_id: string;
 		resource_type: string;
@@ -39,16 +36,11 @@
 	let imageAltered: boolean = false;
 
 	let error: string = '';
-	let step = 4;
+	let step = 0;
 
 	// Progress to the next step
 	const nextStep = () => {
-		if (step == 0 && password != '1234') {
-			error = 'Password inválida';
-			return;
-		}
-		if (step < 5) {
-			error = '';
+		if (step < steps.length) {
 			step++;
 		}
 	};
@@ -84,9 +76,9 @@
 
 		const formData = new FormData();
 		formData.append('id', id);
-		formData.append('password', password);
+		formData.append('author', $userStore);
 		formData.append('title', title);
-		formData.append('author', author);
+
 		formData.append('description', description);
 		formData.append('date', date);
 
@@ -134,49 +126,6 @@
 		<div class="my-auto w-full" in:slide={{ axis: 'x' }}>
 			{#if step === 0}
 				<div>
-					<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="password"
-						>Password:
-					</label>
-					<input
-						class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-						type="password"
-						id="password"
-						name="password"
-						bind:value={password}
-						required
-					/>
-				</div>
-			{/if}
-			{#if step === 1}
-				<div>
-					<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="author"
-						>Autor:
-					</label>
-					<div class="flex flex-row space-x-6 items-center justify-center">
-						<button
-							class="text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
-			hover:bg-gray-300 hover:text-black w-44 {author == 'Gabi' ? 'bg-bordeau-800' : 'bg-pink'}
-			"
-							on:click={() => (author = 'Gabi')}
-						>
-							<img class="rounded-full" src="gabiii.jpg" alt="Gabi" />
-
-							Gabi
-						</button>
-						<button
-							class=" text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
-			hover:bg-gray-300 hover:text-black w-44 {author == 'Miguel' ? 'bg-bordeau-800' : 'bg-pink'}
-			"
-							on:click={() => (author = 'Miguel')}
-						>
-							<img class="rounded-full" src="miguel_foto.jpeg" alt="Miguel" />
-							Miguel
-						</button>
-					</div>
-				</div>
-			{/if}
-			{#if step === 2}
-				<div>
 					<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="date">Date: </label>
 					<input type="hidden" id="date" name="date" bind:value={date} />
 					<DatePicker
@@ -187,7 +136,7 @@
 					/>
 				</div>
 			{/if}
-			{#if step === 3}
+			{#if step === 1}
 				<div>
 					<div>
 						<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="title"
@@ -216,7 +165,7 @@
 					</div>
 				</div>
 			{/if}
-			{#if step === 4}
+			{#if step === 2}
 				<div>
 					<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image"
 						>Image/Video:
@@ -261,9 +210,9 @@
 			hover:bg-bordeau-500 hover:text-white w-20
 			"
 						type="submit"
-						on:click={step === 4 ? submitForm : nextStep}
+						on:click={step === steps.length - 1 ? submitForm : nextStep}
 					>
-						{#if step === 4}
+						{#if step === steps.length - 1}
 							<MdDone></MdDone>
 						{:else}
 							<MdArrowForward />
