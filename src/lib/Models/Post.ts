@@ -8,4 +8,5 @@ export interface Post {
 	content: { public_image_id: string; resource_type: string; image: string }[];
 	author?: string;
 	comments?: Comment[];
+	likes?: number;
 }

@@ -19,7 +19,7 @@
 	<Carousel bind:this={carousel} let:currentPageIndex>
 		{#each files as file}
 			{#if file.type.match('image')}
-				<div class="img-container">
+				<div class="img-container flex items-center max-h-128">
 					{#if edit}
 						<button
 							class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
@@ -30,7 +30,7 @@
 							<MdDelete />
 						</button>
 					{/if}
-					<img src={file.src} alt={file.name} />
+					<img src={file.src} alt={file.name} loading="lazy" />
 				</div>
 			{:else if file.type.match('video')}
 				<div class="video-container">

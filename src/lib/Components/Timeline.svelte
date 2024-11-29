@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
 	import type { Post } from '$lib/Models/Post';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import AddEventModal from './AddEventModal.svelte';
 	import { Timeline } from 'svelte-vertical-timeline';
 	import ItemDesktop from './ItemDesktop.svelte';
@@ -72,6 +72,59 @@
 	const onCancel = (_text: any) => {};
 
 	const onOkay = (_text: any) => {};
+
+	let loading = false;
+	let reachedEnd = false;
+	let currentPage = 1;
+	const loadMore = () => {
+		if (loading || reachedEnd) return;
+		loading = true;
+		fetch(`/load-more`)
+			.then((res) => {
+				res.json().then((data) => {
+					if (data.posts.length === 0) {
+						reachedEnd = true;
+						loading = false;
+						window.removeEventListener('scroll', handleScroll);
+						return;
+					}
+					posts = [...posts, ...data.posts];
+					loading = false;
+				});
+			})
+			.catch((err) => console.log(err));
+	};
+
+	const handleScroll = () => {
+		const threshold = 200;
+		const scrollPosition = window.scrollY + window.innerHeight;
+		const pageHeight = document.documentElement.scrollHeight;
+
+		if (pageHeight - scrollPosition <= threshold) {
+			loadMore();
+		}
+	};
+
+	onMount(() => {
+		window.addEventListener('scroll', handleScroll);
+		let targetElement = window.location.href.includes('#')
+			? document.getElementById(window.location.href.split('#')[1])
+			: null;
+		const offset = 50; // Adjust this value for scrolling farther down
+		if (targetElement) {
+			const elementPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+			const scrollPosition = elementPosition + offset;
+
+			window.scrollTo({
+				top: scrollPosition,
+				behavior: 'smooth' // Smooth scrolling
+			});
+		}
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+		};
+	});
 </script>
 
 <svelte:window bind:innerWidth />
@@ -96,4 +149,16 @@
 			{/if}
 		{/each}
 	</Timeline>
+
+	{#if loading}
+		<div class="w-full flex flex-col justify-center items-center my-auto">
+			<div class="animate-spin rounded-full h-16 w-16 border-b-4 border-bordeau-800"></div>
+			<h1 class="text-bordeau-800 font-bold text-md">Carregando...</h1>
+		</div>
+	{/if}
+	{#if reachedEnd}
+		<div class="w-full py-4 flex flex-col justify-center items-center my-auto">
+			<h1 class="text-border-800 font-bold text-xl">Não há mais posts !</h1>
+		</div>
+	{/if}
 </div>

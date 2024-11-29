@@ -9,7 +9,7 @@
 	import { modal, userStore } from '$lib/Data/stores';
 	import { onMount } from 'svelte';
 	export let data;
-	$: ({ post, user } = data);
+	$: ({ post, user, currentPage } = data);
 	onMount(() => {
 		userStore.set(user);
 	});
@@ -35,7 +35,7 @@
 <Modal show={$modal}>
 	<div class="w-full flex flex-col items-center bg-pink min-h-screen py-4">
 		<div class="flex flex-row mt-3 justify-between w-10/12">
-			<BackButton />
+			<BackButton {currentPage} postId={post._id} />
 			<LoginButton />
 		</div>
 
@@ -78,7 +78,7 @@
 							/>
 							<p class="text-xl font-bold">{comment.author}</p>
 							<p>{comment.content}</p>
-							{#if $userStore == comment.author}
+							{#if $userStore.name != ''}
 								<button
 									class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
 								 

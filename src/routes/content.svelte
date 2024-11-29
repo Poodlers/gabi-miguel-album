@@ -36,7 +36,7 @@
 >
 	<FilterMenu />
 	<SearchBar />
-	{#if $userStore}
+	{#if $userStore.name != ''}
 		<AddButton />
 	{/if}
 

@@ -37,6 +37,7 @@
 
 	let error: string = '';
 	let step = 0;
+	let loading = false;
 
 	// Progress to the next step
 	const nextStep = () => {
@@ -76,12 +77,12 @@
 
 		const formData = new FormData();
 		formData.append('id', id);
-		formData.append('author', $userStore);
+		formData.append('author', $userStore.name);
 		formData.append('title', title);
 
 		formData.append('description', description);
 		formData.append('date', date);
-
+		loading = true;
 		$files.forEach((file, index) => {
 			if (file.file === null) return;
 			const newFile = new File([file.file!], `${index}_${file.file?.name}`, {
@@ -103,6 +104,7 @@
 		console.log(result);
 		error = result.message;
 		if (result.success) {
+			loading = false;
 			close();
 			window.location.reload();
 		}
@@ -122,104 +124,111 @@
 		current={step}
 		size={clientWidth < 768 ? '2rem' : '3rem'}
 	/>
-	{#key step}
-		<div class="my-auto w-full" in:slide={{ axis: 'x' }}>
-			{#if step === 0}
-				<div>
-					<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="date">Date: </label>
-					<input type="hidden" id="date" name="date" bind:value={date} />
-					<DatePicker
-						inputTxt={date}
-						on:datepicked={(event) => {
-							date = event.detail;
-						}}
-					/>
-				</div>
-			{/if}
-			{#if step === 1}
-				<div>
+	{#if loading}
+		<div class="w-full flex flex-col justify-center items-center my-auto">
+			<div class="animate-spin rounded-full h-32 w-32 border-b-4 border-bordeau-800"></div>
+			<h1 class="text-bordeau-800 font-bold text-2xl">Carregando...</h1>
+		</div>
+	{:else}
+		{#key step}
+			<div class="my-auto w-full" in:slide={{ axis: 'x' }}>
+				{#if step === 0}
 					<div>
-						<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="title"
-							>Title:
-						</label>
-						<input
-							class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							type="text"
-							id="title"
-							name="title"
-							bind:value={title}
-							required
-						/>
-					</div>
-
-					<div>
-						<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="description"
-							>Description:
-						</label>
-						<textarea
-							class="text-left shadow appearance-none border rounded h-20 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-							id="description"
-							name="description"
-							bind:value={description}
-						/>
-					</div>
-				</div>
-			{/if}
-			{#if step === 2}
-				<div>
-					<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image"
-						>Image/Video:
-					</label>
-
-					{#if $files.length > 0}
-						<CarouselCustom
-							edit={true}
-							on:delete={(event) => {
-								console.log(event.detail);
-								$files = $files.filter((f) => f.src !== event.detail);
-								console.log($files);
+						<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="date">Date: </label>
+						<input type="hidden" id="date" name="date" bind:value={date} />
+						<DatePicker
+							inputTxt={date}
+							on:datepicked={(event) => {
+								date = event.detail;
 							}}
-							files={$files.map((f) => ({ src: f.src, type: f.type, name: f.src }))}
 						/>
+					</div>
+				{/if}
+				{#if step === 1}
+					<div>
+						<div>
+							<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="title"
+								>Title:
+							</label>
+							<input
+								class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+								type="text"
+								id="title"
+								name="title"
+								bind:value={title}
+								required
+							/>
+						</div>
+
+						<div>
+							<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="description"
+								>Description:
+							</label>
+							<textarea
+								class="text-left shadow appearance-none border rounded h-56 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+								id="description"
+								name="description"
+								bind:value={description}
+							/>
+						</div>
+					</div>
+				{/if}
+				{#if step === 2}
+					<div>
+						<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="image"
+							>Image/Video:
+						</label>
+
+						{#if $files.length > 0}
+							<CarouselCustom
+								edit={true}
+								on:delete={(event) => {
+									console.log(event.detail);
+									$files = $files.filter((f) => f.src !== event.detail);
+									console.log($files);
+								}}
+								files={$files.map((f) => ({ src: f.src, type: f.type, name: f.src }))}
+							/>
+						{/if}
+
+						<FileUploader callback={() => {}} acceptedFileTypes="image/*, video/*" />
+					</div>
+				{/if}
+				{#if error}
+					<p class="text-red-500 text-s italic font-bold">{error}</p>
+				{/if}
+
+				<div class="flex flex-row justify-between">
+					{#if step > 0}
+						<div class="flex flex-col items-center justify-center">
+							<button
+								class="mt-4 bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
+			hover:bg-bordeau-500 hover:text-white w-20
+			"
+								type="submit"
+								on:click={previousStep}
+							>
+								<MdArrowBack />
+							</button>
+						</div>
 					{/if}
-
-					<FileUploader callback={() => {}} acceptedFileTypes="image/*, video/*" />
-				</div>
-			{/if}
-			{#if error}
-				<p class="text-red-500 text-s italic font-bold">{error}</p>
-			{/if}
-
-			<div class="flex flex-row justify-between">
-				{#if step > 0}
-					<div class="flex flex-col items-center justify-center">
+					<div class="flex flex-col items-center justify-end">
 						<button
 							class="mt-4 bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
 			hover:bg-bordeau-500 hover:text-white w-20
 			"
 							type="submit"
-							on:click={previousStep}
+							on:click={step === steps.length - 1 ? submitForm : nextStep}
 						>
-							<MdArrowBack />
+							{#if step === steps.length - 1}
+								<MdDone></MdDone>
+							{:else}
+								<MdArrowForward />
+							{/if}
 						</button>
 					</div>
-				{/if}
-				<div class="flex flex-col items-center justify-end">
-					<button
-						class="mt-4 bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
-			hover:bg-bordeau-500 hover:text-white w-20
-			"
-						type="submit"
-						on:click={step === steps.length - 1 ? submitForm : nextStep}
-					>
-						{#if step === steps.length - 1}
-							<MdDone></MdDone>
-						{:else}
-							<MdArrowForward />
-						{/if}
-					</button>
 				</div>
 			</div>
-		</div>
-	{/key}
+		{/key}
+	{/if}
 </div>

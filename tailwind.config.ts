@@ -55,7 +55,11 @@ export default {
 				900: '#7F1D1D'
 			}
 		},
-		extend: {}
+		extend: {
+			spacing: {
+				'128': '32rem'
+			}
+		}
 	},
 
 	plugins: [require('@tailwindcss/typography')]

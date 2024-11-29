@@ -67,7 +67,8 @@ export const POST = async ({ request }) => {
 				: cloudinary.url(result.public_id, {
 						quality: 'auto',
 						fetch_format: 'auto',
-						secure: true
+						secure: true,
+						width: 800
 					});
 		content.push({
 			resource_type: result.resource_type,
@@ -81,7 +82,8 @@ export const POST = async ({ request }) => {
 		title: title,
 		description: description,
 		author: author,
-		comments: []
+		comments: [],
+		likes: 0
 	});
 	return new Response(
 		JSON.stringify({
@@ -203,7 +205,8 @@ export const PUT = async ({ request }) => {
 				: cloudinary.url(result.public_id, {
 						quality: 'auto',
 						fetch_format: 'auto',
-						secure: true
+						secure: true,
+						width: 800
 					});
 		content.push({
 			resource_type: result.resource_type,

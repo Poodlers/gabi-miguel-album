@@ -52,12 +52,12 @@
 </script>
 
 <div class="ml-4 px-2 relative">
-	{#if !$userStore}
+	{#if $userStore.name == ''}
 		<button class="w-10 h-10 rounded" on:click={showDialog}><FaUserCircle /> </button>
 	{:else}
 		<button on:click={toggleDropdown}>
 			<div class="flex flex-row items-center">
-				<img src={userToPicture[$userStore]} alt="author" class="w-10 h-10 rounded-full" />
+				<img src={userToPicture[$userStore.name]} alt="author" class="w-10 h-10 rounded-full" />
 				<div class="w-5 h-5"><FaAngleDown /></div>
 			</div>
 		</button>
