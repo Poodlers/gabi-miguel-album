@@ -62,7 +62,10 @@
 		</div>
 
 		<div class="w-11/12">
-			<h2 class="text-left text-3xl font-bold mb-5">Comentários</h2>
+			<div class="flex flex-row items-end mb-5 space-x-6">
+				<h2 class="text-left text-3xl font-bold">Comentários</h2>
+				<p class="text-left text-xl font-bold">{post.comments.length}</p>
+			</div>
 			{#if !post.comments}
 				<p class="text-center">Nenhum comentário ainda</p>
 			{:else}

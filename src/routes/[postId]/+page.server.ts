@@ -2,7 +2,7 @@ import { posts } from '$db/posts';
 import type { Post } from '$lib/Models/Post';
 import { ObjectId } from 'mongodb';
 import type { PageServerLoad } from './$types';
-import type { Like, User } from '$lib/Models/User';
+import type { User } from '$lib/Models/User';
 
 export const load = (async ({
 	cookies,
@@ -19,11 +19,8 @@ export const load = (async ({
 	const currentPage = Number(cookies.get('pageNumber')) || 1;
 	const { _id, date, title, description, content, author, comments, likes } = post;
 	const likedCookies = JSON.parse(cookies.get('liked') || '[]') as string[];
-	let likedUser: Like = {};
-	for (const like of likedCookies) {
-		likedUser[like] = true;
-	}
-	let finalUser: User = { name: user ? user : '', likes: likedUser };
+
+	let finalUser: User = { name: user ? user : '', likes: likedCookies };
 
 	return {
 		post: {

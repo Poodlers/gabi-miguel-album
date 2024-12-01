@@ -39,18 +39,24 @@ export const GET = async ({ url, cookies }) => {
 	const liked = likedCookies.includes(id);
 	if (liked) {
 		await posts.updateOne({ _id: new ObjectId(id) }, { $inc: { likes: -1 } });
+		likedCookies.splice(likedCookies.indexOf(id), 1);
+		cookies.set('liked', JSON.stringify(likedCookies), {
+			path: '/',
+			httpOnly: true,
+			maxAge: 60 * 60 * 24 * 365 * 10
+		});
 	} else {
 		await posts.updateOne({ _id: new ObjectId(id) }, { $inc: { likes: 1 } });
 		likedCookies.push(id);
 		cookies.set('liked', JSON.stringify(likedCookies), {
 			path: '/',
 			httpOnly: true,
-			maxAge: 60 * 60 * 24 * 365
+			maxAge: 60 * 60 * 24 * 365 * 10
 		});
 	}
 	return new Response(
 		JSON.stringify({
-			likes: post.likes
+			likes: post.likes + (liked ? -1 : 1)
 		}),
 		{
 			status: 200,

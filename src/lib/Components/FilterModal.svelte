@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
 
-	import { beginDateStore, endDateStore, postsOrder } from '$lib/Data/stores';
+	import { beginDateStore, endDateStore, postsOrder, postsOrderBy } from '$lib/Data/stores';
 	import dayjs from 'dayjs';
 	import DatePicker from './DatePicker.svelte';
 
 	export let message;
 
 	let order: string = $postsOrder;
+	let orderBy: string = $postsOrderBy;
 
 	let beginDate: string = $beginDateStore;
 	let endDate: string = $endDateStore;
@@ -15,6 +16,7 @@
 	const { close } = getContext<{ close: () => void }>('simple-modal');
 
 	const resetFilters = () => {
+		orderBy = 'date';
 		order = '1';
 		beginDate = '2024-01-01';
 		endDate = dayjs().format('YYYY-MM-DD');
@@ -22,9 +24,12 @@
 	};
 
 	const applyFilters = () => {
-		fetch(`/filter?order=${order}&beginDate=${beginDate}&endDate=${endDate}`, {
-			method: 'GET'
-		})
+		fetch(
+			`/filter?orderParam=${orderBy}&order=${order}&beginDate=${beginDate}&endDate=${endDate}`,
+			{
+				method: 'GET'
+			}
+		)
 			.then((res) => res.json())
 			.then((data) => {
 				console.log(data);
@@ -41,14 +46,26 @@
 	<h1 class="text-center text-bordeau font-extrabold text-3xl">{message}</h1>
 
 	<div>
+		<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="order">Por: </label>
+		<select
+			class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+			id="grid-state"
+			bind:value={orderBy}
+		>
+			<option value="date">Data</option>
+			<option value="likes">Likes</option>
+			<option value="comments">Comentários</option>
+		</select>
+	</div>
+	<div>
 		<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="order">Ordem: </label>
 		<select
 			class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
 			id="grid-state"
 			bind:value={order}
 		>
-			<option value="1">Mais antigos primeiro</option>
-			<option value="-1">Mais recentes primeiro</option>
+			<option value="1">Ascendente</option>
+			<option value="-1">Descendente</option>
 		</select>
 	</div>
 	<label class="block text-gray-700 text-md font-bold mb-2 mt-2" for="date"

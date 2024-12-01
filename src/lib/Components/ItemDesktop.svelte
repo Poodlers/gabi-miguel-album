@@ -27,14 +27,14 @@
 	{#if $userStore.name != ''}
 		<button
 			class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
-            absolute bottom-0 left-3 z-10"
+            absolute top-0 left-3 z-10"
 			on:click={() => onEdit(post)}
 		>
 			<MdEdit />
 		</button>
 		<button
 			class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
-                 absolute bottom-0 right-3 z-10
+                 absolute top-0 right-3 z-10
             "
 			on:click={() => onDelete(post._id, post.content)}
 		>
@@ -65,7 +65,12 @@
 				{post.description}
 			</p>
 			<div class="flex flex-row items-center mt-auto space-x-4 justify-end">
-				<LikeButtom postId={post._id} /><span>{post.likes}</span>
+				<LikeButtom
+					postId={post._id}
+					on:change={(event) => {
+						post.likes = event.detail;
+					}}
+				/><span class="text-xl font-bold">{post.likes}</span>
 				<button
 					class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-3 rounded"
 					on:click={() => {

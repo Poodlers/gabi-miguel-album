@@ -4,7 +4,6 @@
 -->
 <script>
 	// @ts-nocheck
-
 	import { getContext } from 'svelte';
 	import { userStore } from '$lib/Data/stores';
 	// @ts-ignore
