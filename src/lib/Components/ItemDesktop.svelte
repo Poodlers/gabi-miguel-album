@@ -18,6 +18,11 @@
 
 	export let post: Post;
 
+	function convertDateFormat(dateString: string) {
+		const [year, month, day] = dateString.split('-'); // Split by "-"
+		return `${day}/${month}/${year}`; // Rearrange to "DD/MM/YYYY"
+	}
+
 	export let onEdit;
 	export let onDelete;
 	export let isNewDate;
@@ -46,7 +51,9 @@
 			<TimelineDot
 				style="background-color: #A6E1FA; border-radius: 5px; border-color: #603140; width: 15vw;"
 			>
-				<p class="text-indigo-700 font-bold text-xl text-center w-full">{post.date}</p>
+				<p class="text-indigo-700 font-bold text-xl text-center w-full">
+					{convertDateFormat(post.date)}
+				</p>
 			</TimelineDot>
 		{/if}
 
@@ -54,8 +61,8 @@
 	</TimelineSeparator>
 
 	<TimelineOppositeContent slot="opposite-content" style="align-content:center;  ">
-		<div id="post-{post._id}" class="w-full min-h-48 flex flex-col">
-			<h2 class="text-center text-2xl font-bold">{post.title}</h2>
+		<div id="post-{post._id}" class="w-full min-h-48 flex flex-col h-5/6">
+			<h2 class="text-center text-2xl font-bold mb-5">{post.title}</h2>
 
 			<p
 				class="text-left break-words px-4

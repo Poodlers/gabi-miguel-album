@@ -63,9 +63,9 @@
 		</TimelineOppositeContent>
 
 		<TimelineContent style="align-content:center;">
-			<div class="w-screen lg:max-w-md md:max-w-72 flex flex-col">
+			<div class="w-screen lg:max-w-md md:max-w-72 flex flex-col my-5">
 				<h2 class="text-center text-2xl font-bold">{post.title}</h2>
-				<p class="text-left break-words px-4">{post.description}</p>
+				<p class="text-left break-words px-4 my-5">{post.description}</p>
 				<div class="flex flex-row justify-center items-center mt-auto space-x-4">
 					<LikeButtom
 						postId={post._id}
