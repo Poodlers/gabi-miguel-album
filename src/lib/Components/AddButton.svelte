@@ -31,6 +31,6 @@
 	};
 </script>
 
-<button class="bg-black w-10 h-10 text-white rounded" on:click={showDialog}>
+<button class="bg-black w-12 text-white rounded" on:click={showDialog}>
 	<MdAdd />
 </button>

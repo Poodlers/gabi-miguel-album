@@ -11,6 +11,7 @@
 	import ItemDesktop from './ItemDesktop.svelte';
 	import ItemMobile from './ItemMobile.svelte';
 	import { files } from '$lib/Data/stores';
+	import ConfirmDelete from './ConfirmDelete.svelte';
 
 	export let posts: Post[];
 
@@ -46,8 +47,7 @@
 		);
 	}
 
-	function onDelete(postId: string, public_image_ids: string[]) {
-		console.log(postId, public_image_ids);
+	function delelePost(postId: string, public_image_ids: string[]) {
 		fetch(`/delete?post=${postId}`, {
 			method: 'DELETE',
 			headers: {
@@ -63,6 +63,28 @@
 				}
 			})
 			.catch((err) => console.log(err));
+	}
+
+	function onDelete(postId: string, postTitle: string, public_image_ids: string[]) {
+		open(
+			ConfirmDelete,
+			{
+				message: 'Confirmar ação',
+				hasForm: true,
+				onDelete: delelePost,
+				public_image_ids,
+				postId,
+				postTitle,
+				onCancel,
+				onOkay
+			},
+			{
+				closeButton: true,
+				closeOnEsc: false,
+				closeOnOuterClick: true,
+				background: 'rgba(0, 0, 0, .5)'
+			}
+		);
 	}
 
 	const { open } = getContext<{ open: (component: any, props: any, options: any) => void }>(

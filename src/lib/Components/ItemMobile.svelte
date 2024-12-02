@@ -14,6 +14,7 @@
 	import type { Post } from '$lib/Models/Post';
 	import CarouselCustom from './CarouselCustom.svelte';
 	import LikeButtom from './LikeButtom.svelte';
+	import { convertDateFormat } from '$lib/utils/utils';
 	export let post: Post;
 	export let onEdit;
 	export let onDelete;
@@ -34,7 +35,7 @@
 			class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
                  absolute top-5 right-5 z-10
             "
-			on:click={() => onDelete(post._id, post.content)}
+			on:click={() => onDelete(post._id, post.title, post.content)}
 		>
 			<MdDelete />
 		</button>
@@ -42,9 +43,11 @@
 	{#if isNewDate}
 		<TimelineSeparator>
 			<TimelineDot
-				style="background-color: #A6E1FA; border-radius: 5px; border-color: #603140; width: 40vw"
+				style="background-color: #603140; border-radius: 5px; border-color: #603140;  width: 40vw"
 			>
-				<p class="text-indigo-700 font-bold text-xl text-center w-full">{post.date}</p>
+				<p class="text-bordeau-300 font-bold text-xl text-center w-full">
+					{convertDateFormat(post.date.toString())}
+				</p>
 			</TimelineDot>
 		</TimelineSeparator>
 	{/if}
@@ -66,19 +69,23 @@
 			<div class="w-screen lg:max-w-md md:max-w-72 flex flex-col my-5">
 				<h2 class="text-center text-2xl font-bold">{post.title}</h2>
 				<p class="text-left break-words px-4 my-5">{post.description}</p>
-				<div class="flex flex-row justify-center items-center mt-auto space-x-4">
-					<LikeButtom
-						postId={post._id}
-						on:change={(event) => {
-							post.likes = event.detail;
-						}}
-					/><span class="text-xl font-bold">{post.likes}</span>
-					<p class="text-xl font-bold">Postado por {post.author}</p>
-					<img
-						src={post.author == 'Gabi' ? 'gabiii.jpg' : 'miguel_foto.jpeg'}
-						alt="author"
-						class="w-10 h-10 rounded-full"
-					/>
+				<div class="flex flex-row justify-center items-center mt-auto space-x-20 w-full">
+					<div class="flex flex-row items-center space-x-3">
+						<LikeButtom
+							postId={post._id}
+							on:change={(event) => {
+								post.likes = event.detail;
+							}}
+						/><span class="text-xl font-bold">{post.likes}</span>
+					</div>
+					<div class="flex flex-row items-center space-x-3">
+						<p class="text-lg font-bold">{post.author}</p>
+						<img
+							src={post.author == 'Gabi' ? 'gabiii.jpg' : 'miguel_foto.jpeg'}
+							alt="author"
+							class="w-10 h-10 rounded-full"
+						/>
+					</div>
 					<button
 						class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-3 rounded"
 						on:click={() => {

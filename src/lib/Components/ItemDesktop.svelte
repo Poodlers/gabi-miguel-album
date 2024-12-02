@@ -15,13 +15,9 @@
 	import CarouselCustom from './CarouselCustom.svelte';
 	import type { Post } from '$lib/Models/Post';
 	import LikeButtom from './LikeButtom.svelte';
+	import { convertDateFormat } from '$lib/utils/utils';
 
 	export let post: Post;
-
-	function convertDateFormat(dateString: string) {
-		const [year, month, day] = dateString.split('-'); // Split by "-"
-		return `${day}/${month}/${year}`; // Rearrange to "DD/MM/YYYY"
-	}
 
 	export let onEdit;
 	export let onDelete;
@@ -41,7 +37,7 @@
 			class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
                  absolute top-0 right-3 z-10
             "
-			on:click={() => onDelete(post._id, post.content)}
+			on:click={() => onDelete(post._id, post.title, post.content)}
 		>
 			<MdDelete />
 		</button>
@@ -49,15 +45,17 @@
 	<TimelineSeparator>
 		{#if isNewDate}
 			<TimelineDot
-				style="background-color: #A6E1FA; border-radius: 5px; border-color: #603140; width: 15vw;"
+				style="background-color: #603140; border-radius: 5px; border-color: #603140; width: 15vw;"
 			>
-				<p class="text-indigo-700 font-bold text-xl text-center w-full">
-					{convertDateFormat(post.date)}
+				<p class="text-bordeau-300 font-bold text-xl text-center w-full">
+					{convertDateFormat(post.date.toString())}
 				</p>
 			</TimelineDot>
 		{/if}
 
-		<TimelineConnector></TimelineConnector>
+		<TimelineConnector
+			style="background-color: #603140; border-radius: 5px; border-color: #603140; "
+		></TimelineConnector>
 	</TimelineSeparator>
 
 	<TimelineOppositeContent slot="opposite-content" style="align-content:center;  ">
@@ -72,25 +70,33 @@
 				{post.description}
 			</p>
 			<div class="flex flex-row items-center mt-auto space-x-4 justify-end">
-				<LikeButtom
-					postId={post._id}
-					on:change={(event) => {
-						post.likes = event.detail;
-					}}
-				/><span class="text-xl font-bold">{post.likes}</span>
-				<button
-					class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-3 rounded"
-					on:click={() => {
-						window.location.href = `/${post._id}`;
-					}}
-					>Ver mais
-				</button>
-				<p class="text-xl font-bold">Postado por {post.author}</p>
-				<img
-					src={post.author == 'Gabi' ? 'gabiii.jpg' : 'miguel_foto.jpeg'}
-					alt="author"
-					class="w-10 h-10 rounded-full"
-				/>
+				<div class="flex flex-row justify-between items-end w-full ml-4">
+					<div class="flex flex-row items-center mt-5 space-x-4 justify-end">
+						<LikeButtom
+							postId={post._id}
+							on:change={(event) => {
+								post.likes = event.detail;
+							}}
+						/><span class="text-xl font-bold">{post.likes}</span>
+					</div>
+					<div class="flex flex-row items-center justify-center w-full">
+						<button
+							class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-6 rounded"
+							on:click={() => {
+								window.location.href = `/${post._id}`;
+							}}
+							>Ver mais
+						</button>
+					</div>
+					<div class="flex flex-row items-center space-x-4 w-10/12 justify-end">
+						<p class="text-lg font-bold">Postado por {post.author}</p>
+						<img
+							src={post.author == 'Gabi' ? 'gabiii.jpg' : 'miguel_foto.jpeg'}
+							alt="author"
+							class="w-10 h-10 rounded-full"
+						/>
+					</div>
+				</div>
 			</div>
 		</div></TimelineOppositeContent
 	>
