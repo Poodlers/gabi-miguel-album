@@ -3,6 +3,7 @@
 	This component consists of the Add Button. When clicked it will open the Add Post modal
 -->
 <script>
+	import { files } from '$lib/Data/stores';
 	import AddEventModal from './AddEventModal.svelte';
 	import { getContext } from 'svelte';
 	// @ts-ignore
@@ -13,6 +14,7 @@
 
 	const onOkay = (/** @type {any} */ _text) => {};
 	const showDialog = () => {
+		files.set([]);
 		open(
 			AddEventModal,
 			{

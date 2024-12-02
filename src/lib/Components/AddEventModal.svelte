@@ -32,7 +32,7 @@
 	export let title: string = '';
 	export let description: string = '';
 	export let date: string = '';
-	console.log($files);
+	
 	let imageAltered: boolean = false;
 
 	let error: string = '';
