@@ -24,7 +24,7 @@
 	// Drag zone element
 	let dragZone: HTMLDivElement;
 	//Maximum files that can be uploaded
-	export let maxFiles = 3;
+	export let maxFiles = 20;
 	// When the maximum files are uploaded
 	let maxFilesCallback = (files: any, maxFiles: number) => {};
 

@@ -6,10 +6,39 @@
 	import Timeline from '$lib/Components/Timeline.svelte';
 	import type { Post } from '$lib/Models/Post';
 	import { userStore } from '$lib/Data/stores';
+	import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
 	export let posts: Post[];
+
+	let angle = tweened(0, { duration: 1000, easing: cubicOut });
+
+	// Toggle the angle back and forth
+	let flip = true;
+
+	function animateFlipFlop() {
+		angle.set(flip ? 30 : -30); // Adjust angles here
+		flip = !flip;
+	}
+
+	// Animate the flip-flop every 2 seconds
+	onMount(() => {
+		const id = setInterval(animateFlipFlop, 1000);
+
+		return () => {
+			clearInterval(id);
+		};
+	});
+
 </script>
 
-<div class="flex flex-row justify-between items-center">
+<div class="flex flex-row justify-between items-center w-10/12 mt-5">
+	<img 
+	  src="gabi_pixel.png"
+		alt="Gabi"
+		class="w-24 h-24 rounded"
+		style="transform: rotate({$angle}deg);"
+	/>
 	<img
 		src="https://img1.picmix.com/output/stamp/normal/4/6/5/4/2444564_f86a6.gif"
 		alt="Logo"
@@ -20,6 +49,12 @@
 		src="https://img1.picmix.com/output/stamp/normal/4/6/5/4/2444564_f86a6.gif"
 		alt="Logo"
 		class="w-20 h-20"
+	/>
+	<img 
+	  src="miguel_pixel.png"
+		alt="Miguel"
+		class="w-24 h-24 rounded"
+		style="transform: rotate({$angle}deg);"
 	/>
 </div>
 <div

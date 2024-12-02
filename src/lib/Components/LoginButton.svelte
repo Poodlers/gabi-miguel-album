@@ -2,9 +2,9 @@
 @component
 	This component consists of the Login Button. 
 -->
-<script>
+<script lang="ts">
 	// @ts-nocheck
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { userStore } from '$lib/Data/stores';
 	// @ts-ignore
 	import MdAdd from 'svelte-icons/md/MdAdd.svelte';
@@ -18,15 +18,15 @@
 		Miguel: 'miguel_foto.jpeg'
 	};
 
+
+
 	const onLogout = () => {
 		fetch('/logout').then(() => {
 			window.location.reload();
 		});
 	};
 	let show = false;
-	const toggleDropdown = () => {
-		show = !show;
-	};
+
 	console.log($userStore);
 	const onCancel = (/** @type {any} */ _text) => {};
 
@@ -54,10 +54,15 @@
 	{#if $userStore.name == ''}
 		<button class="w-10 h-10 rounded" on:click={showDialog}><FaUserCircle /> </button>
 	{:else}
-		<button on:click={toggleDropdown}>
-			<div class="flex flex-row items-center">
+		<button id="opendropdown"
+			
+			on:click={() => {
+				show = !show;
+			}}
+		>
+			<div class="flex flex-row items-center space-x-2">
 				<img src={userToPicture[$userStore.name]} alt="author" class="w-10 h-10 rounded-full" />
-				<div class="w-8"><FaAngleDown /></div>
+				<div class="w-6"><FaAngleDown /></div>
 			</div>
 		</button>
 		<div
@@ -69,7 +74,10 @@
 			class:hidden={!show}
 		>
 			<ul>
-				<li><button on:click={onLogout}>Logout</button></li>
+				<li
+					class="hover:bg-gray-200 cursor-pointer py-1 px-2"
+					
+				><button on:click={onLogout}>Logout</button></li>
 			</ul>
 		</div>
 	{/if}
