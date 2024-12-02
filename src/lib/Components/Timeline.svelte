@@ -152,6 +152,12 @@
 <svelte:window bind:innerWidth />
 
 <div class="w-full">
+	{#if posts.length === 0}
+		<div class="w-full py-4 flex flex-col justify-center items-center my-auto">
+			<h1 class="text-border-800 font-bold text-xl">Não há nenhum post : &#40; </h1>
+		</div>
+	{/if}
+
 	<Timeline position={'alternate'} style={' padding: 50px 0; border-radius: 2%;'}>
 		{#each posts as post, index}
 			{#if innerWidth > 640}

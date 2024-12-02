@@ -36,7 +36,7 @@
 
 <svelte:window bind:innerWidth />
 
-<div class="flex flex-row justify-between items-center w-10/12 mt-5 my-auto">
+<div class="flex flex-row justify-between items-center w-10/12 mt-5 mx-auto">
 	{#if innerWidth > 640}
 	<img 
 	  src="gabi_pixel.png"
