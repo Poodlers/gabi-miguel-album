@@ -60,15 +60,17 @@
 
 	<TimelineOppositeContent slot="opposite-content" style="align-content:center;  ">
 		<div id="post-{post._id}" class="w-full min-h-48 flex flex-col h-5/6">
-			<h2 class="text-center text-2xl font-bold mb-5">{post.title}</h2>
+			<div class="flex flex-col items-center h-full justify-center">
+				<h2 class="text-center text-2xl font-bold mb-5">{post.title}</h2>
 
-			<p
-				class="text-left break-words px-4
-				overflow-y-auto max-h-80
-			"
-			>
-				{post.description}
-			</p>
+				<p
+					class="text-left break-words px-4
+					overflow-y-auto max-h-80
+				"
+				>
+					{post.description}
+				</p>
+		  </div>
 			<div class="flex flex-row items-center mt-auto space-x-4 justify-end">
 				<div class="flex flex-row justify-between items-end w-full ml-4">
 					<div class="flex flex-row items-center mt-5 space-x-4 justify-end">

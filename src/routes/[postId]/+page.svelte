@@ -1,4 +1,5 @@
 <script lang="ts">
+
 	import AddComment from '$lib/Components/AddComment.svelte';
 	import BackButton from '$lib/Components/BackButton.svelte';
 	import CarouselCustom from '$lib/Components/CarouselCustom.svelte';
@@ -34,10 +35,26 @@
 </script>
 
 <Modal show={$modal}>
+
 	<div class="w-full flex flex-col items-center bg-pink min-h-screen py-4">
-		<div class="flex flex-row mt-3 justify-between w-10/12">
+		
+			<div
+				class=" 
+				flex
+				flex-row
+				justify-between
+				items-center
+				mt-2
+				mb-4
+				w-11/12
+				mx-auto
+
+			"
+			>
 			<BackButton {currentPage} postId={post._id} />
+			
 			<LoginButton />
+			
 		</div>
 
 		<div class="flex items-center justify-center w-screen">
