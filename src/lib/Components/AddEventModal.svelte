@@ -10,9 +10,9 @@
 	import MdDone from 'svelte-icons/md/MdDone.svelte';
 	import CarouselCustom from './CarouselCustom.svelte';
 	let steps = [
-		{ text: 'Passo 3: Insere a data' },
-		{ text: 'Passo 4: Insere o título e descrição' },
-		{ text: 'Passo 5: Insere imagens/vídeos' }
+		{ text: 'Passo 1: Insere a data' },
+		{ text: 'Passo 2: Insere o título e descrição' },
+		{ text: 'Passo 3: Insere imagens/vídeos' }
 	];
 
 	export let message;
@@ -198,12 +198,12 @@
 					<p class="text-red-500 text-s italic font-bold">{error}</p>
 				{/if}
 
-				<div class="flex flex-row justify-between">
+				<div class="flex flex-row justify-between my-5">
 					{#if step > 0}
 						<div class="flex flex-col items-center justify-center">
 							<button
-								class="mt-4 bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
-			hover:bg-bordeau-500 hover:text-white w-20
+								class="bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
+			hover:bg-bordeau-500 hover:text-white w-20 
 			"
 								type="submit"
 								on:click={previousStep}
@@ -214,8 +214,8 @@
 					{/if}
 					<div class="flex flex-col items-center justify-end">
 						<button
-							class="mt-4 bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
-			hover:bg-bordeau-500 hover:text-white w-20
+							class="bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
+			hover:bg-bordeau-500 hover:text-white w-20 
 			"
 							type="submit"
 							on:click={step === steps.length - 1 ? submitForm : nextStep}
