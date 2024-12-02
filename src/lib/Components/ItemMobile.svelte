@@ -21,7 +21,7 @@
 	export let isNewDate;
 </script>
 
-<TimelineItem style="flex-direction: column; align-items:center;">
+<TimelineItem style="flex-direction: column; align-items:center; overflow-x:hidden;">
 	{#if $userStore.name != ''}
 		<button
 			class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
