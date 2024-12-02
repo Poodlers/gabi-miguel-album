@@ -19,7 +19,7 @@
 	>
 		Tens a certeza que queres apagar o post "{postTitle}" ?
 	</p>
-	<div class="flex flex-row justify-between w-1/2 mt-6">
+	<div class="flex flex-row justify-between w-4/6 mt-6">
 		<button
 			class="mt-4 bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
         hover:bg-bordeau-500 hover:text-white w-20
