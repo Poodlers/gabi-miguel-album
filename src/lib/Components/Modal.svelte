@@ -515,7 +515,7 @@
 		display: block;
 		box-sizing: border-box;
 		position: absolute;
-		z-index: 1000;
+		z-index: 10;
 		top: 1rem;
 		right: 1rem;
 		margin: 0;
