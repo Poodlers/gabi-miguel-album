@@ -97,7 +97,7 @@
 
 	let loading = false;
 	let reachedEnd = false;
-	let currentPage = 1;
+
 	const loadMore = () => {
 		if (loading || reachedEnd) return;
 		loading = true;

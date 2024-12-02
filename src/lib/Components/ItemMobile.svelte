@@ -68,8 +68,11 @@
 		<TimelineContent style="align-content:center;">
 			<div class="w-screen lg:max-w-md md:max-w-72 flex flex-col my-5">
 				<h2 class="text-center text-2xl font-bold">{post.title}</h2>
-				<p class="text-left break-words px-4 my-5">{post.description}</p>
-				<div class="flex flex-row justify-center items-center mt-auto space-x-20 w-full">
+				<p class="text-left break-words px-4 my-5 max-h-24 overflow-hidden 
+					text-elipsis 	overflow-ellipsis line-clamp-4
+				">{post.description}</p>
+				
+				<div class="flex flex-row justify-between items-center mt-auto w-10/12 mx-auto">
 					<div class="flex flex-row items-center space-x-3">
 						<LikeButtom
 							postId={post._id}

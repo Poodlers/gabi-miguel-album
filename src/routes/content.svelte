@@ -9,6 +9,7 @@
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
+	import MessageOfTheDay from '$lib/Components/MessageOfTheDay.svelte';
 	export let posts: Post[];
 
 	let angle = tweened(0, { duration: 1000, easing: cubicOut });
@@ -64,13 +65,14 @@
 	/>
 	{/if}
 </div>
+<MessageOfTheDay />
 <div
 	class=" 
 	flex
 	flex-row
 	justify-between
 	items-center
-	mt-4
+	mt-2
 	mb-4
 	w-11/12
 

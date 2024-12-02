@@ -25,7 +25,8 @@ export const load = (async ({
 
 	cookies.set('pageNumber', '1', {
 		path: '/',
-		httpOnly: true
+		httpOnly: true,
+		maxAge: 60 * 60 * 24 * 7
 	});
 
 	cookies.delete('search', {

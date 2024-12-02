@@ -33,7 +33,7 @@
 					<img src={file.src} alt={file.name} loading="lazy" />
 				</div>
 			{:else if file.type.match('video')}
-				<div class="video-container overflow-x-hidden">
+				<div class="video-container overflow-x-hidden flex items-center max-h-128  ">
 					{#if edit}
 						<button
 							class="bg-bordeau-500 hover:bg-bordeau-700 text-white font-bold py-1 px-2 rounded w-10 h-10
@@ -44,7 +44,7 @@
 							<MdDelete />
 						</button>
 					{/if}
-					<video src={file.src} controls style="width: auto; height: auto; border-radius: 6px;">
+					<video src={file.src} controls style=" border-radius: 6px;">
 						<track kind="captions" src="captions.vtt" srclang="en" label="English" />
 					</video>
 				</div>
@@ -66,6 +66,15 @@
 
 <style>
 	img {
+		width: auto; /* Retain the natural width */
+		height: auto; /* Retain the natural height */
+		max-width: 100%; /* Prevent parent container constraints */
+		max-height: 100%; /* Prevent parent container constraints */
+		display: block; /* Avoid inline element side effects */
+		margin: 0 auto;
+	}
+
+	video {
 		width: auto; /* Retain the natural width */
 		height: auto; /* Retain the natural height */
 		max-width: 100%; /* Prevent parent container constraints */

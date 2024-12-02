@@ -89,7 +89,7 @@
 						</button>
 					</div>
 					<div class="flex flex-row items-center space-x-4 w-10/12 justify-end">
-						<p class="text-lg font-bold">Postado por {post.author}</p>
+						<p class="text-lg font-bold">{post.author}</p>
 						<img
 							src={post.author == 'Gabi' ? 'gabiii.jpg' : 'miguel_foto.jpeg'}
 							alt="author"
@@ -102,7 +102,7 @@
 	>
 
 	<TimelineContent style="align-content:center;">
-		<div class="flex items-center justify-center w-screen lg:max-w-xl md:max-w-96 mx-auto">
+		<div class="flex items-center justify-center w-full lg:max-w-112 md:max-w-96 mx-auto">
 			<CarouselCustom
 				files={post.content.map((f) => ({
 					src: f.image,
