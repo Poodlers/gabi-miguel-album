@@ -15,6 +15,7 @@
 
 	// Toggle the angle back and forth
 	let flip = true;
+	let innerWidth = 0;
 
 	function animateFlipFlop() {
 		angle.set(flip ? 30 : -30); // Adjust angles here
@@ -32,30 +33,36 @@
 
 </script>
 
-<div class="flex flex-row justify-between items-center w-10/12 mt-5">
+<svelte:window bind:innerWidth />
+
+<div class="flex flex-row justify-between items-center w-10/12 mt-5 my-auto">
+	{#if innerWidth > 640}
 	<img 
 	  src="gabi_pixel.png"
 		alt="Gabi"
 		class="w-20 h-20 rounded"
 		style="transform: rotate({$angle}deg);"
 	/>
+	{/if}
 	<img
 		src="https://img1.picmix.com/output/stamp/normal/4/6/5/4/2444564_f86a6.gif"
 		alt="Logo"
-		class="w-16 h-16"
+		class="w-20 h-20"
 	/>
 	<h1 class="mt-4 text-3xl font-bold text-center">Timeline do Amor</h1>
 	<img
 		src="https://img1.picmix.com/output/stamp/normal/4/6/5/4/2444564_f86a6.gif"
 		alt="Logo"
-		class="w-16 h-16"
+		class="w-20 h-20"
 	/>
+	{#if innerWidth > 640}
 	<img 
 	  src="miguel_pixel.png"
 		alt="Miguel"
 		class="w-20 h-20 rounded"
 		style="transform: rotate({$angle}deg);"
 	/>
+	{/if}
 </div>
 <div
 	class=" 

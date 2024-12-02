@@ -54,7 +54,7 @@
 
 	<div>
 		<TimelineOppositeContent slot="opposite-content" style="align-content:center; ">
-			<div id="post-{post._id}" class="flex items-center justify-center w-screen">
+			<div id="post-{post._id}" class="flex items-center justify-center w-screen my-auto">
 				<CarouselCustom
 					files={post.content.map((f) => ({
 						src: f.image,
