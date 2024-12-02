@@ -2,6 +2,9 @@ import { v2 as cloudinary } from 'cloudinary';
 import { createReadStream } from 'streamifier';
 import { posts } from '$db/posts';
 import { ObjectId } from 'mongodb';
+import sharp from 'sharp';
+
+
 
 export const POST = async ({ request }) => {
 	const formData = await request.formData();
@@ -30,8 +33,16 @@ export const POST = async ({ request }) => {
 				}
 			);
 		}
+		//use sharp to resize the image to 800px
+		
 
-		const buffer = new Uint8Array(await image.arrayBuffer());
+		let buffer = new Uint8Array(await image.arrayBuffer());
+		console.log('buffer size before resize:', buffer.length);
+		if(!image.type.includes('video')){
+			buffer = await sharp(buffer).resize({width: 800}).toBuffer();
+			console.log('buffer size after resize:', buffer.length);
+		}
+
 		fileUploads.push(
 			() =>
 				new Promise(
@@ -44,7 +55,8 @@ export const POST = async ({ request }) => {
 							{
 								folder: 'gabi',
 								resource_type: 'auto',
-								overwrite: true
+								overwrite: true,
+								width: 800
 							},
 							function (error, result: any) {
 								resolve(result);
@@ -164,7 +176,13 @@ export const PUT = async ({ request }) => {
 		const correspondingFile = files.find((f: File) => f.name == file.name);
 
 		if (correspondingFile) {
-			const buffer = new Uint8Array(await correspondingFile.arrayBuffer());
+			//resize the correspondingFile to 800px
+			let buffer = new Uint8Array(await correspondingFile.arrayBuffer());
+			console.log('buffer size before resize:', buffer.length);
+			if(!correspondingFile.type.includes('video')){
+				buffer = await sharp(buffer).resize({width: 800}).toBuffer();
+				console.log('buffer size after resize:', buffer.length);
+			}
 			fileUploads.push(
 				() =>
 					new Promise(
@@ -177,7 +195,8 @@ export const PUT = async ({ request }) => {
 								{
 									folder: 'gabi',
 									resource_type: 'auto',
-									overwrite: true
+									overwrite: true,
+									width: 800
 								},
 								function (error, result: any) {
 									resolve(result);
