@@ -4,8 +4,6 @@ import { posts } from '$db/posts';
 import { ObjectId } from 'mongodb';
 import sharp from 'sharp';
 
-
-
 export const POST = async ({ request }) => {
 	const formData = await request.formData();
 	const date = formData.get('date');
@@ -13,7 +11,9 @@ export const POST = async ({ request }) => {
 	const author = formData.get('author');
 	const description = formData.get('description');
 	const files = formData.getAll('files');
-	let fileUploads = [];
+
+	let content = [];
+	const results = [];
 	console.log('formData:', formData);
 	for (const file of files) {
 		const image = file as File;
@@ -34,43 +34,38 @@ export const POST = async ({ request }) => {
 			);
 		}
 		//use sharp to resize the image to 800px
-		
 
 		let buffer = new Uint8Array(await image.arrayBuffer());
 		console.log('buffer size before resize:', buffer.length);
-		if(!image.type.includes('video')){
-			buffer = await sharp(buffer).resize({width: 800}).toBuffer();
+		if (!image.type.includes('video')) {
+			buffer = await sharp(buffer).resize({ width: 800 }).toBuffer();
 			console.log('buffer size after resize:', buffer.length);
 		}
 
-		fileUploads.push(
-			() =>
-				new Promise(
-					(
-						resolve: (value: any) => void,
+		const result = await new Promise(
+			(
+				resolve: (value: any) => void,
 
-						reject
-					) => {
-						const cld_upload_stream = cloudinary.uploader.upload_stream(
-							{
-								folder: 'gabi',
-								resource_type: 'auto',
-								overwrite: true,
-								width: 800
-							},
-							function (error, result: any) {
-								resolve(result);
-							}
-						);
-
-						createReadStream(buffer).pipe(cld_upload_stream);
+				reject
+			) => {
+				const cld_upload_stream = cloudinary.uploader.upload_stream(
+					{
+						folder: 'gabi',
+						resource_type: 'auto',
+						overwrite: true,
+						width: 800
+					},
+					function (error, result: any) {
+						resolve(result);
 					}
-				)
+				);
+
+				createReadStream(buffer).pipe(cld_upload_stream);
+			}
 		);
+		results.push(result);
 	}
-	const promises = fileUploads.map((task) => task()); // Execute all tasks
-	const results = await Promise.all(promises); // Wait for all to finish
-	let content = [];
+
 	for (const result of results) {
 		console.log('result:', result);
 		const optimizedURL =
@@ -168,7 +163,7 @@ export const PUT = async ({ request }) => {
 		}
 	}
 	let content = [];
-	let fileUploads = [];
+	let results = [];
 	for (const file of filesInfo) {
 		// upload the files that are not in the originalFiles array
 
@@ -179,42 +174,37 @@ export const PUT = async ({ request }) => {
 			//resize the correspondingFile to 800px
 			let buffer = new Uint8Array(await correspondingFile.arrayBuffer());
 			console.log('buffer size before resize:', buffer.length);
-			if(!correspondingFile.type.includes('video')){
-				buffer = await sharp(buffer).resize({width: 800}).toBuffer();
+			if (!correspondingFile.type.includes('video')) {
+				buffer = await sharp(buffer).resize({ width: 800 }).toBuffer();
 				console.log('buffer size after resize:', buffer.length);
 			}
-			fileUploads.push(
-				() =>
-					new Promise(
-						(
-							resolve: (value: any) => void,
+			const result = await new Promise(
+				(
+					resolve: (value: any) => void,
 
-							reject
-						) => {
-							const cld_upload_stream = cloudinary.uploader.upload_stream(
-								{
-									folder: 'gabi',
-									resource_type: 'auto',
-									overwrite: true,
-									width: 800
-								},
-								function (error, result: any) {
-									resolve(result);
-								}
-							);
-
-							createReadStream(buffer).pipe(cld_upload_stream);
+					reject
+				) => {
+					const cld_upload_stream = cloudinary.uploader.upload_stream(
+						{
+							folder: 'gabi',
+							resource_type: 'auto',
+							overwrite: true,
+							width: 800
+						},
+						function (error, result: any) {
+							resolve(result);
 						}
-					)
+					);
+
+					createReadStream(buffer).pipe(cld_upload_stream);
+				}
 			);
+			results.push(result);
 		} else {
 			const originalImage = originalFiles.find((f) => f.image == file.src);
 			content.push(originalImage);
 		}
 	}
-
-	const promises = fileUploads.map((task) => task()); // Execute all tasks
-	const results = await Promise.all(promises); // Wait for all to finish
 
 	for (const result of results) {
 		console.log('result:', result);

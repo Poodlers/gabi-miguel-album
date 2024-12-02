@@ -16,7 +16,6 @@
 	export let posts: Post[] = [];
 
 	let innerWidth: number = 0;
-	
 
 	function onEdit(post: Post) {
 		$files = post.content.map((content) => ({
@@ -101,9 +100,11 @@
 	const loadMore = () => {
 		if (loading || reachedEnd) return;
 		loading = true;
-		fetch(`/load-more`)
+		console.log('loading more');
+		fetch('/load-more')
 			.then((res) => {
 				res.json().then((data) => {
+					console.log(data);
 					if (data.posts.length === 0) {
 						reachedEnd = true;
 						loading = false;
@@ -154,7 +155,7 @@
 <div class="w-full">
 	{#if posts.length === 0}
 		<div class="w-full py-4 flex flex-col justify-center items-center my-auto">
-			<h1 class="text-border-800 font-bold text-xl">Não há nenhum post : &#40; </h1>
+			<h1 class="text-border-800 font-bold text-xl">Não há nenhum post : &#40;</h1>
 		</div>
 	{/if}
 

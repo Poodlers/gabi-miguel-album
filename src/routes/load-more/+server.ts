@@ -5,8 +5,6 @@ export const GET = async ({ cookies }) => {
 	const beginDate = cookies.get('beginDate') || '2024-01-01';
 	const endDate = cookies.get('endDate') || new Date().toISOString().split('T')[0];
 	const searchQuery = cookies.get('search') || '';
-	
-	
 	const orderBy = cookies.get('orderBy') || 'date';
 
 	const pageSize = 5;
@@ -15,6 +13,7 @@ export const GET = async ({ cookies }) => {
 		httpOnly: true
 	});
 	let pageNumber = cookies.get('pageNumber') as number | undefined;
+	console.log(pageNumber);
 	if (!pageNumber) {
 		pageNumber = 1;
 	} else {
@@ -51,10 +50,10 @@ export const GET = async ({ cookies }) => {
 					$sort: { commentsLength: Number(order) } // Sort by the array length (descending)
 				},
 				{
-					$skip : pageNumber * pageSize
+					$skip: pageNumber * pageSize
 				},
 				{
-					$limit: pageSize  // Limit the results
+					$limit: pageSize // Limit the results
 				},
 				{
 					$project: { commentsLength: 0 } // Optionally remove the temporary field
@@ -90,7 +89,7 @@ export const GET = async ({ cookies }) => {
 					{ description: { $regex: searchQuery, $options: 'i' } }
 				]
 			})
-			.skip(pageNumber * pageSize)
+			.skip((pageNumber - 1) * pageSize)
 			.limit(pageSize)
 			.map((doc) => {
 				console.log(doc);
