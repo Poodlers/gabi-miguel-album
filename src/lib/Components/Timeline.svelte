@@ -13,10 +13,10 @@
 	import { files } from '$lib/Data/stores';
 	import ConfirmDelete from './ConfirmDelete.svelte';
 
-	export let posts: Post[];
+	export let posts: Post[] = [];
 
 	let innerWidth: number = 0;
-	let isNewDate: boolean = false;
+	
 
 	function onEdit(post: Post) {
 		$files = post.content.map((content) => ({
