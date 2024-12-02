@@ -62,7 +62,7 @@
 		>
 			<div class="flex flex-row items-center space-x-2">
 				<img src={userToPicture[$userStore.name]} alt="author" class="w-10 h-10 rounded-full" />
-				<div class="w-6"><FaAngleDown /></div>
+				<div class="w-8"><FaAngleDown /></div>
 			</div>
 		</button>
 		<div

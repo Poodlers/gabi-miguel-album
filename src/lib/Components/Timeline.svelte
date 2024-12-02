@@ -15,7 +15,7 @@
 
 	export let posts: Post[];
 
-	let innerWidth: number = 1000;
+	let innerWidth: number = 0;
 	let isNewDate: boolean = false;
 
 	function onEdit(post: Post) {
