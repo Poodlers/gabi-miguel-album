@@ -3,25 +3,43 @@ import { randomUUID } from 'crypto';
 import { ObjectId } from 'mongodb';
 
 export const POST = async ({ request, cookies }) => {
-	const { content, postId } = await request.json();
+	const { content, postId, parentId } = await request.json();
 	const user = cookies.get('user');
-	posts.updateOne(
-		{ _id: new ObjectId(postId) },
-		{
-			$push: {
-				comments: {
-					$each: [
-						{
-							_id: randomUUID(),
-							content: content,
-							author: user ? user : 'Anónimo',
-							date: new Date()
-						}
-					]
+	if (!parentId) {
+		posts.updateOne(
+			{ _id: new ObjectId(postId) },
+			{
+				$push: {
+					comments: {
+						$each: [
+							{
+								_id: randomUUID(),
+								content: content,
+								author: user ? user : 'Anónimo',
+								date: new Date(),
+								replies: []
+							}
+						]
+					}
 				}
 			}
-		}
-	);
+		);
+	} else {
+		posts.updateOne(
+			{ _id: new ObjectId(postId), 'comments._id': parentId },
+			{
+				$push: {
+					'comments.$.replies': {
+						_id: randomUUID(),
+						content: content,
+						author: user ? user : 'Anónimo',
+						date: new Date()
+					}
+				}
+			}
+		);
+	}
+
 	return new Response('Comment added', { status: 200 });
 };
 

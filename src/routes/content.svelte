@@ -31,19 +31,18 @@
 			clearInterval(id);
 		};
 	});
-
 </script>
 
 <svelte:window bind:innerWidth />
 
 <div class="flex flex-row justify-between items-center w-10/12 mt-5 mx-auto">
 	{#if innerWidth > 640}
-	<img 
-	  src="gabi_pixel.png"
-		alt="Gabi"
-		class="w-20 h-20 rounded"
-		style="transform: rotate({$angle}deg);"
-	/>
+		<img
+			src="gabi_pixel.png"
+			alt="Gabi"
+			class="w-20 h-20 rounded"
+			style="transform: rotate({$angle}deg);"
+		/>
 	{/if}
 	<img
 		src="https://img1.picmix.com/output/stamp/normal/4/6/5/4/2444564_f86a6.gif"
@@ -57,12 +56,12 @@
 		class="w-20 h-20"
 	/>
 	{#if innerWidth > 640}
-	<img 
-	  src="miguel_pixel.png"
-		alt="Miguel"
-		class="w-20 h-20 rounded"
-		style="transform: rotate({$angle}deg);"
-	/>
+		<img
+			src="miguel_pixel.png"
+			alt="Miguel"
+			class="w-20 h-20 rounded"
+			style="transform: rotate({$angle}deg);"
+		/>
 	{/if}
 </div>
 <MessageOfTheDay />
@@ -72,8 +71,7 @@
 	flex-row
 	justify-between
 	items-center
-	mt-2
-	mb-4
+	my-2
 	w-11/12
 
 "

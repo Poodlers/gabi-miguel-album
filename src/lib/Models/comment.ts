@@ -3,4 +3,5 @@ export interface Comment {
 	author: string;
 	content: string;
 	date: Date;
+	replies: { _id: string; author: string; content: string; date: Date }[];
 }

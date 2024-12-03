@@ -13,7 +13,7 @@ export const GET = async ({ cookies }) => {
 		httpOnly: true
 	});
 	let pageNumber = cookies.get('pageNumber') as number | undefined;
-	console.log(pageNumber);
+
 	if (!pageNumber) {
 		pageNumber = 1;
 	} else {

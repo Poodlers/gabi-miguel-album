@@ -3,13 +3,6 @@ import { createHash } from 'crypto';
 
 export const POST = async ({ request, cookies }) => {
 	const { name, password } = await request.json();
-	console.log(name, password);
-	console.log(
-		'hash ',
-		createHash('sha256')
-			.update(password as string)
-			.digest('hex')
-	);
 	const user = await users.findOne({
 		name,
 		password: createHash('sha256')

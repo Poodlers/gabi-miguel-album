@@ -18,8 +18,6 @@
 		Miguel: 'miguel_foto.jpeg'
 	};
 
-
-
 	const onLogout = () => {
 		fetch('/logout').then(() => {
 			window.location.reload();
@@ -27,7 +25,6 @@
 	};
 	let show = false;
 
-	console.log($userStore);
 	const onCancel = (/** @type {any} */ _text) => {};
 
 	const onOkay = (/** @type {any} */ _text) => {};
@@ -54,8 +51,8 @@
 	{#if $userStore.name == ''}
 		<button class="w-10 h-10 rounded" on:click={showDialog}><FaUserCircle /> </button>
 	{:else}
-		<button id="opendropdown"
-			
+		<button
+			id="opendropdown"
 			on:click={() => {
 				show = !show;
 			}}
@@ -74,10 +71,9 @@
 			class:hidden={!show}
 		>
 			<ul>
-				<li
-					class="hover:bg-gray-200 cursor-pointer py-1 px-2"
-					
-				><button on:click={onLogout}>Logout</button></li>
+				<li class="hover:bg-gray-200 cursor-pointer py-1 px-2">
+					<button on:click={onLogout}>Logout</button>
+				</li>
 			</ul>
 		</div>
 	{/if}

@@ -159,7 +159,7 @@
 		</div>
 	{/if}
 
-	<Timeline position={'alternate'} style={' padding: 50px 0; border-radius: 2%;'}>
+	<Timeline position={'alternate'} style={' padding: 25px 0; border-radius: 2%;'}>
 		{#each posts as post, index}
 			{#if innerWidth > 640}
 				<ItemDesktop
