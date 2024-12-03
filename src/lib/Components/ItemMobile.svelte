@@ -11,6 +11,8 @@
 	import MdDelete from 'svelte-icons/md/MdDelete.svelte';
 	// @ts-ignore
 	import MdEdit from 'svelte-icons/md/MdEdit.svelte';
+	// @ts-ignore
+	import MdModeComment from 'svelte-icons/md/MdModeComment.svelte';
 	import type { Post } from '$lib/Models/Post';
 	import CarouselCustom from './CarouselCustom.svelte';
 	import LikeButtom from './LikeButtom.svelte';
@@ -66,20 +68,34 @@
 		</TimelineOppositeContent>
 
 		<TimelineContent style="align-content:center;">
-			<div class="w-screen lg:max-w-md md:max-w-72 flex flex-col my-5">
-				<h2 class="text-center text-2xl font-bold">{post.title}</h2>
-				<p class="text-left break-words px-4 my-5 max-h-24 overflow-hidden 
-					text-elipsis 	overflow-ellipsis line-clamp-4
-				">{post.description}</p>
-				
+			<div class="w-full lg:max-w-md md:max-w-72 flex flex-col my-5">
+				<div class="w-11/12 mx-auto">
+					<h2 class="text-center text-2xl font-bold">{post.title}</h2>
+					<p
+						class="text-left break-words px-4 my-5 max-h-24 overflow-hidden
+					text-elipsis overflow-ellipsis line-clamp-4
+				"
+					>
+						{post.description}
+					</p>
+				</div>
+
 				<div class="flex flex-row justify-between items-center mt-auto w-10/12 mx-auto">
 					<div class="flex flex-row items-center space-x-3">
-						<LikeButtom
-							postId={post._id}
-							on:change={(event) => {
-								post.likes = event.detail;
-							}}
-						/><span class="text-xl font-bold">{post.likes}</span>
+						<div class="flex flex-row items-center space-x-3">
+							<LikeButtom
+								postId={post._id}
+								on:change={(event) => {
+									post.likes = event.detail;
+								}}
+							/><span class="text-xl font-bold">{post.likes}</span>
+						</div>
+						<div class="flex flex-row items-center space-x-3">
+							<div class="w-10 h-10">
+								<MdModeComment />
+							</div>
+							<span class="text-xl font-bold">{post.commentsLength}</span>
+						</div>
 					</div>
 					<div class="flex flex-row items-center space-x-3">
 						<p class="text-lg font-bold">{post.author}</p>

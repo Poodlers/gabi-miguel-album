@@ -25,88 +25,56 @@ export const GET = async ({ cookies }) => {
 		httpOnly: true,
 		maxAge: 60 * 60 * 24 * 7
 	});
-	let data;
-	if (orderBy == 'comments') {
-		data = await posts
-			.aggregate([
-				{
-					$match: {
-						date: {
-							$gte: new Date(beginDate),
-							$lte: new Date(endDate)
-						},
-						$or: [
-							{ title: { $regex: searchQuery, $options: 'i' } },
-							{ description: { $regex: searchQuery, $options: 'i' } }
-						]
-					}
-				},
-				{
-					$addFields: {
-						commentsLength: { $size: '$comments' } // Add a field with the array length
-					}
-				},
-				{
-					$sort: { commentsLength: Number(order) } // Sort by the array length (descending)
-				},
-				{
-					$skip: pageNumber * pageSize
-				},
-				{
-					$limit: pageSize // Limit the results
-				},
-				{
-					$project: { commentsLength: 0 } // Optionally remove the temporary field
+	const data = await posts
+		.aggregate([
+			{
+				$match: {
+					date: {
+						$gte: new Date(beginDate),
+						$lte: new Date(endDate)
+					},
+					$or: [
+						{ title: { $regex: searchQuery, $options: 'i' } },
+						{ description: { $regex: searchQuery, $options: 'i' } }
+					]
 				}
-			])
-			.map((doc) => {
-				const { _id, date, title, description, content, author, likes } = doc;
+			},
+			{
+				$addFields: {
+					commentsLength: { $size: '$comments' } // Add a field with the array length
+				}
+			},
+			{
+				$sort:
+					orderBy == 'comments'
+						? { commentsLength: Number(order) }
+						: orderBy == 'date'
+							? { date: Number(order) }
+							: { likes: Number(order) }
+			},
+			{
+				$skip: pageNumber * pageSize
+			},
+			{
+				$limit: pageSize // Limit the results
+			}
+		])
+		.map((doc) => {
+			const { _id, date, title, description, content, author, likes, commentsLength } = doc;
 
-				return {
-					_id,
-					date: date.toISOString().split('T')[0],
-					title,
-					description,
-					content,
-					author,
-					likes
-				};
-			})
-			.toArray();
-	} else {
-		data = await posts
-			.find({})
-			.sort(
-				orderBy == 'date' ? { date: Number(order) as 1 | -1 } : { likes: Number(order) as 1 | -1 }
-			)
-			.filter({
-				date: {
-					$gte: new Date(beginDate),
-					$lte: new Date(endDate)
-				},
-				$or: [
-					{ title: { $regex: searchQuery, $options: 'i' } },
-					{ description: { $regex: searchQuery, $options: 'i' } }
-				]
-			})
-			.skip((pageNumber - 1) * pageSize)
-			.limit(pageSize)
-			.map((doc) => {
-				console.log(doc);
-				const { _id, date, title, description, content, author, likes } = doc;
+			return {
+				_id,
+				date: date.toISOString().split('T')[0],
+				title,
+				description,
+				content,
+				author,
+				likes,
+				commentsLength
+			};
+		})
+		.toArray();
 
-				return {
-					_id,
-					date: date.toISOString().split('T')[0],
-					title,
-					description,
-					content,
-					author,
-					likes
-				};
-			})
-			.toArray();
-	}
 	const dataCleaned = JSON.parse(JSON.stringify(data));
 
 	return new Response(

@@ -33,9 +33,9 @@ export const load = (async ({
 		path: '/',
 		httpOnly: true
 	});
-	let data;
-	if (orderBy == 'comments') {
-		data = await posts
+
+	
+	const data = await posts
 			.aggregate([
 				{
 					$match: {
@@ -55,17 +55,18 @@ export const load = (async ({
 					}
 				},
 				{
-					$sort: { commentsLength: Number(order) } // Sort by the array length (descending)
+					$sort: orderBy == 'comments' ? { commentsLength: Number(order) } 
+					: orderBy == 'date' ? { date: Number(order) } 
+					: { likes: Number(order) }
+					
 				},
 				{
 					$limit: pageSize * Number(currentPage) // Limit the results
 				},
-				{
-					$project: { commentsLength: 0 } // Optionally remove the temporary field
-				}
+				
 			])
 			.map((doc) => {
-				const { _id, date, title, description, content, author, likes } = doc;
+				const { _id, date, title, description, content, author, likes, commentsLength} = doc;
 
 				return {
 					_id,
@@ -74,47 +75,16 @@ export const load = (async ({
 					description,
 					content,
 					author,
-					likes
+					likes,
+					commentsLength
 				};
-			})
+		})
 			.toArray();
-	} else {
-		data = await posts
-			.find({})
-			.sort(
-				orderBy == 'date' ? { date: Number(order) as 1 | -1 } : { likes: Number(order) as 1 | -1 }
-			)
-			.filter({
-				date: {
-					$gte: new Date(beginDate),
-					$lte: new Date(endDate)
-				},
-				$or: [
-					{ title: { $regex: searchQuery, $options: 'i' } },
-					{ description: { $regex: searchQuery, $options: 'i' } }
-				]
-			})
-			.limit(pageSize * Number(currentPage))
-			.map((doc) => {
-				console.log(doc);
-				const { _id, date, title, description, content, author, likes } = doc;
-
-				return {
-					_id,
-					date: date.toISOString().split('T')[0],
-					title,
-					description,
-					content,
-					author,
-					likes
-				};
-			})
-			.toArray();
-	}
+	
 	const dataCleaned = JSON.parse(JSON.stringify(data));
 
 	const likedCookies = JSON.parse(cookies.get('liked') || '[]') as string[];
-	console.log(likedCookies);
+	
 	let finalUser: User = { name: user ? user : '', likes: likedCookies };
 
 	return {

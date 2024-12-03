@@ -10,4 +10,4 @@ start_mongo()
 		console.error('Failed to connect to MongoDB:', err);
 	});
 
-console.log(config_cloudinary());
+config_cloudinary();

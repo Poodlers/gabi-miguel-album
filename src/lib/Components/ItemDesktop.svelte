@@ -12,6 +12,8 @@
 	import MdDelete from 'svelte-icons/md/MdDelete.svelte';
 	// @ts-ignore
 	import MdEdit from 'svelte-icons/md/MdEdit.svelte';
+	// @ts-ignore
+	import MdModeComment from 'svelte-icons/md/MdModeComment.svelte';
 	import CarouselCustom from './CarouselCustom.svelte';
 	import type { Post } from '$lib/Models/Post';
 	import LikeButtom from './LikeButtom.svelte';
@@ -70,16 +72,24 @@
 				>
 					{post.description}
 				</p>
-		  </div>
+			</div>
 			<div class="flex flex-row items-center mt-auto space-x-4 justify-end">
 				<div class="flex flex-row justify-between items-end w-full ml-4">
 					<div class="flex flex-row items-center mt-5 space-x-4 justify-end">
-						<LikeButtom
-							postId={post._id}
-							on:change={(event) => {
-								post.likes = event.detail;
-							}}
-						/><span class="text-xl font-bold">{post.likes}</span>
+						<div class="flex flex-row items-center space-x-4 justify-end">
+							<LikeButtom
+								postId={post._id}
+								on:change={(event) => {
+									post.likes = event.detail;
+								}}
+							/><span class="text-xl font-bold">{post.likes}</span>
+						</div>
+						<div class="flex flex-row items-center space-x-3">
+							<div class="w-10 h-10">
+								<MdModeComment />
+							</div>
+							<span class="text-xl font-bold">{post.commentsLength}</span>
+						</div>
 					</div>
 					<div class="flex flex-row items-center justify-center w-full">
 						<button
