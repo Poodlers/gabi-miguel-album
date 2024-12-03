@@ -44,23 +44,36 @@ export const POST = async ({ request, cookies }) => {
 };
 
 export const DELETE = async ({ request, cookies }) => {
-	const { commentId, postId } = await request.json();
+	const { commentId, postId, parentCommentId } = await request.json();
 	const user = cookies.get('user');
 	const post = await posts.findOne({ _id: new ObjectId(postId) });
 	if (!post) {
 		return new Response('Post not found', { status: 404 });
 	}
 	const comment = post.comments.find((comment: any) => comment._id.toString() === commentId);
-
-	posts.updateOne(
-		{ _id: new ObjectId(postId) },
-		{
-			$pull: {
-				comments: {
-					_id: commentId
+	if (!parentCommentId) {
+		posts.updateOne(
+			{ _id: new ObjectId(postId) },
+			{
+				$pull: {
+					comments: {
+						_id: commentId
+					}
 				}
 			}
-		}
-	);
+		);
+	} else {
+		posts.updateOne(
+			{ _id: new ObjectId(postId), 'comments._id': parentCommentId },
+			{
+				$pull: {
+					'comments.$.replies': {
+						_id: commentId
+					}
+				}
+			}
+		);
+	}
+
 	return new Response('Comment deleted', { status: 200 });
 };

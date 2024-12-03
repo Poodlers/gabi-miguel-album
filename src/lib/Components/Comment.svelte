@@ -75,7 +75,7 @@
 			</button>
 		</div>
 	</div>
-	{#if comment.replies}
+	{#if comment.replies && comment.replies.length > 0}
 		<div class="w-full">
 			<button
 				class="bg-transparent text-black py-1 px-1 font-bold rounded shrink-0 flex flex-row items-center space-x-2 w-full"
@@ -97,7 +97,7 @@
 	<div class="hidden w-full pl-16 my-5" bind:this={replyArea}>
 		<AddComment postId={post._id} parentId={comment._id} />
 	</div>
-	{#if comment.replies}
+	{#if comment.replies && comment.replies.length > 0}
 		<div class:hidden={!showingReplies} class="flex flex-col items-center w-full pl-16">
 			{#each comment.replies as reply}
 				<CommentReply comment={reply} postId={post._id} parentCommentId={comment._id} />
