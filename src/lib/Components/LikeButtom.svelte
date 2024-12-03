@@ -46,7 +46,7 @@
 	};
 </script>
 
-<button class="w-10 h-10 relative" on:click={toggleLike}>
+<button class="w-8 h-8 relative" on:click={toggleLike}>
 	{#if liked}
 		<FaHeart />
 	{:else}

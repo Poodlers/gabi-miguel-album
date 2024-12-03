@@ -76,7 +76,7 @@
 			<div class="flex flex-row items-center mt-auto space-x-4 justify-end">
 				<div class="flex flex-row justify-between items-end w-full ml-4">
 					<div class="flex flex-row items-center mt-5 space-x-4 justify-end">
-						<div class="flex flex-row items-center space-x-4 justify-end">
+						<div class="flex flex-row items-center space-x-2 justify-end">
 							<LikeButtom
 								postId={post._id}
 								on:change={(event) => {
@@ -84,8 +84,8 @@
 								}}
 							/><span class="text-xl font-bold">{post.likes}</span>
 						</div>
-						<div class="flex flex-row items-center space-x-3">
-							<div class="w-10 h-10">
+						<div class="flex flex-row items-center space-x-2">
+							<div class="w-8 h-8">
 								<MdModeComment />
 							</div>
 							<span class="text-xl font-bold">{post.commentsLength}</span>
