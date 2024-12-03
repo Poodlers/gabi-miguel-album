@@ -3,11 +3,6 @@ import { createReadStream } from 'streamifier';
 import { posts } from '$db/posts';
 import { ObjectId } from 'mongodb';
 import sharp from 'sharp';
-import type { Config } from '@sveltejs/adapter-vercel';
-
-export const config: Config = {
-	regions: ['us-east-1']
-};
 
 export const POST = async ({ request }) => {
 	const formData = await request.formData();
