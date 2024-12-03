@@ -6,7 +6,6 @@ import sharp from 'sharp';
 import type { Config } from '@sveltejs/adapter-vercel';
 
 export const config: Config = {
-	runtime: 'edge',
 	regions: ['us-east-1']
 };
 
