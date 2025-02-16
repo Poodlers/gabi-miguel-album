@@ -6,20 +6,19 @@ export const GET = async ({ cookies }) => {
 	const endDate = cookies.get('endDate') || new Date().toISOString().split('T')[0];
 	const searchQuery = cookies.get('search') || '';
 	const orderBy = cookies.get('orderBy') || 'date';
-
 	const pageSize = 5;
 	cookies.delete('search', {
 		path: '/',
 		httpOnly: true
 	});
 	let pageNumber = cookies.get('pageNumber') as number | undefined;
-
+    
 	if (!pageNumber) {
 		pageNumber = 1;
 	} else {
 		pageNumber++;
 	}
-
+	
 	cookies.set('pageNumber', pageNumber.toString(), {
 		path: '/',
 		httpOnly: true,

@@ -23,7 +23,7 @@ export const load = (async ({
 	const searchQuery = cookies.get('search') || '';
 	const user = cookies.get('user');
 
-	cookies.set('pageNumber', '1', {
+	cookies.set('pageNumber', '0', {
 		path: '/',
 		httpOnly: true,
 		maxAge: 60 * 60 * 24 * 7

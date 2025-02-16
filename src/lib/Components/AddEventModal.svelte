@@ -95,19 +95,27 @@
 		formData.append('originalFiles', JSON.stringify(originalPostContent));
 
 		// Make the POST request
-		const response = await fetch('/upload', {
+		try{
+			const response = await fetch('/upload', {
 			method: id === '' ? 'POST' : 'PUT',
 			body: formData
-		});
+			});
+			
 
-		const result = await response.json();
-		console.log(result);
-		error = result.message;
-		if (result.success) {
+			const result = await response.json();
+			console.log(result);
+			error = result.message;
+			if (result.success) {
+				loading = false;
+				close();
+				window.location.reload();
+			}
+		}catch(e){
+			console.log(e);
+			error = 'Erro ao fazer upload: O limite por upload são 4.5 MB. Por favor, tenta novamente.';
 			loading = false;
-			close();
-			window.location.reload();
 		}
+		
 	};
 </script>
 
@@ -129,6 +137,13 @@
 			<div class="animate-spin rounded-full h-32 w-32 border-b-4 border-bordeau-800"></div>
 			<h1 class="text-bordeau-800 font-bold text-2xl">Carregando...</h1>
 		</div>
+	{:else if error}
+	<div class="w-full flex flex-row justify-center items-center my-auto">
+		<svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="red" viewBox="0 0 20 20">
+			<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+		</svg>
+		<p class="text-red-500 text-lg italic font-bold">{error}</p>
+	</div>
 	{:else}
 		{#key step}
 			<div class="my-auto w-full" in:slide={{ axis: 'x' }}>
@@ -194,9 +209,7 @@
 						<FileUploader callback={() => {}} acceptedFileTypes="image/*, video/*" />
 					</div>
 				{/if}
-				{#if error}
-					<p class="text-red-500 text-s italic font-bold">{error}</p>
-				{/if}
+				
 
 				<div class="flex flex-row justify-between my-5">
 					{#if step > 0}

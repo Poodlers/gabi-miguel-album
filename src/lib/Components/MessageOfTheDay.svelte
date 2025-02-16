@@ -3,7 +3,8 @@
 
     // Array of cute messages
     const messages = [
-      "Feliz 7 meses de namoro! 🥰",
+      "Amo amar-te! 🥰",
+      "Tem um ótimo dia! 😘",
     ];
   
     // Calculate the message index based on the current date
