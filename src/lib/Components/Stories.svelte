@@ -5,7 +5,12 @@
 	let timers = [];
 	let progress = Array(count).fill(0);
 	let pausedAt = 0;
-	let paused = false;
+	let paused = true;
+
+	/**
+	 * @type {HTMLAudioElement}
+	 */
+	let audio;
 
 	/**
 	 * @type {number}
@@ -24,8 +29,65 @@
 		currentIndex = index;
 		updateProgress();
 	}
+	// Helper function to wait for canplaythrough
+	/**
+	 * @param {HTMLAudioElement} el
+	 */
+	function waitForCanPlayThrough(el) {
+		return /** @type {Promise<void>} */ (
+			/** @type {Promise<void>} */ (
+				new Promise((resolve, reject) => {
+					// If already ready, resolve immediately
+					if (el.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+						return resolve();
+					}
 
+					// Wait for readiness
+					const onReady = () => {
+						cleanup();
+						resolve();
+					};
+
+					const onError = (/** @type {any} */ e) => {
+						cleanup();
+						reject(e);
+					};
+
+					const cleanup = () => {
+						el.removeEventListener('canplaythrough', onReady);
+						el.removeEventListener('error', onError);
+					};
+
+					el.addEventListener('canplaythrough', onReady, { once: true });
+					el.addEventListener('error', onError, { once: true });
+				})
+			)
+		);
+	}
+	/**
+	 * @param {string} src
+	 */
+	async function switchAudio(src) {
+		try {
+			// Pause current audio if it's playing
+			audio.pause();
+
+			// Reset audio element and set new source
+			audio.src = src;
+			audio.load(); // Ensures the new source begins loading
+
+			// Wait until the audio is ready to play through
+			await waitForCanPlayThrough(audio);
+
+			// Play the new audio
+			await audio.play();
+			console.log(`Playing ${src}`);
+		} catch (err) {
+			console.error(`Failed to play ${src}:`, err);
+		}
+	}
 	function handlePointerDown() {
+		audio.pause();
 		paused = true;
 		pausedAt = progress[currentIndex];
 		cancelAnimationFrame(interval);
@@ -34,6 +96,7 @@
 	function handlePointerUp() {
 		if (paused) {
 			paused = false;
+			audio.play().catch((e) => console.warn('Autoplay failed:', e));
 			animateCurrent(performance.now(), (pausedAt / 100) * duration);
 		}
 	}
@@ -69,16 +132,31 @@
 
 	onMount(() => {
 		updateProgress();
+		const firstSong = document.querySelector('[data-story="0"]')?.getAttribute('data-song');
+		if (firstSong) {
+			switchAudio(firstSong).catch((e) => console.warn('Failed to switch audio:', e));
+		}
 	});
 
 	afterUpdate(() => {
 		const stories = document.querySelectorAll('[data-story]');
 		stories.forEach((el, i) => {
-			el.classList.toggle('active', i === currentIndex);
+			if (i === currentIndex) {
+				el.classList.add('active');
+				const song = el.getAttribute('data-song');
+				if (song) {
+					switchAudio(song).catch((e) => console.warn('Failed to switch audio:', e));
+				} else {
+					audio.pause();
+				}
+			} else {
+				el.classList.remove('active');
+			}
 		});
 	});
 </script>
 
+<audio bind:this={audio}></audio>
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
@@ -105,6 +183,9 @@
 </div>
 
 <style>
+	.story.active {
+		display: block;
+	}
 	.story-container {
 		position: relative;
 		width: 100%;
