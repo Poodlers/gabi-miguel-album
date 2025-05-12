@@ -65,6 +65,12 @@
 	{/if}
 </div>
 <MessageOfTheDay />
+<a
+	href="/wrapped"
+	class="bg-bordeau-500 rounded p-3 text-center font-bold text-pink hover:underline mt-2"
+>
+	Ver o wrappped
+</a>
 <div
 	class=" 
 	flex
