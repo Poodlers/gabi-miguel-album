@@ -1,11 +1,17 @@
 <script>
-	import { onMount, afterUpdate } from 'svelte';
+	// @ts-nocheck
+
+	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
+	import FaVolumeMute from 'svelte-icons/fa/FaVolumeMute.svelte';
+	import FaVolumeUp from 'svelte-icons/fa/FaVolumeUp.svelte';
 	export let count = 0; // Number of stories
 	export let duration = 3000; // Duration for each story in milliseconds
 	let timers = [];
 	let progress = Array(count).fill(0);
 	let pausedAt = 0;
 	let paused = true;
+	let muted = false;
 
 	/**
 	 * @type {HTMLAudioElement}
@@ -73,7 +79,7 @@
 			audio.pause();
 
 			// Reset audio element and set new source
-			audio.src = src;
+			audio.src = '/songs/' + src + '.mp3';
 			audio.load(); // Ensures the new source begins loading
 
 			// Wait until the audio is ready to play through
@@ -81,7 +87,6 @@
 
 			// Play the new audio
 			await audio.play();
-			console.log(`Playing ${src}`);
 		} catch (err) {
 			console.error(`Failed to play ${src}:`, err);
 		}
@@ -138,22 +143,26 @@
 		}
 	});
 
-	afterUpdate(() => {
-		const stories = document.querySelectorAll('[data-story]');
-		stories.forEach((el, i) => {
-			if (i === currentIndex) {
-				el.classList.add('active');
-				const song = el.getAttribute('data-song');
-				if (song) {
-					switchAudio(song).catch((e) => console.warn('Failed to switch audio:', e));
+	$: if (currentIndex !== undefined) {
+		if (browser) {
+			const stories = document.querySelectorAll('[data-story]');
+			stories.forEach((el, i) => {
+				if (i === currentIndex) {
+					el.classList.add('active');
+					const song = el.getAttribute('data-song');
+					if (song) {
+						switchAudio(song).catch((e) => console.warn('Failed to switch audio:', e));
+					} else {
+						audio.pause();
+						audio.src = '';
+						audio.load();
+					}
 				} else {
-					audio.pause();
+					el.classList.remove('active');
 				}
-			} else {
-				el.classList.remove('active');
-			}
-		});
-	});
+			});
+		}
+	}
 </script>
 
 <audio bind:this={audio}></audio>
@@ -171,6 +180,29 @@
 		{#each progress as p}
 			<div class="bar"><div class="fill" style="width: {p}%"></div></div>
 		{/each}
+	</div>
+	<div class="absolute top-5 right-0 flex items-center justify-between p-4 z-25">
+		<div class="w-6 h-6">
+			{#if muted}
+				<FaVolumeMute
+					class="text-white"
+					on:click={() => {
+						console.log('unmuted');
+						audio.volume = 1;
+						muted = false;
+					}}
+				/>
+			{:else}
+				<FaVolumeUp
+					class="text-white"
+					on:click={() => {
+						console.log('muted');
+						audio.volume = 0;
+						muted = true;
+					}}
+				/>
+			{/if}
+		</div>
 	</div>
 	<div class="story-wrapper">
 		<slot />
