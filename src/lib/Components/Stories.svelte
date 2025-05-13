@@ -6,8 +6,7 @@
 	import FaVolumeMute from 'svelte-icons/fa/FaVolumeMute.svelte';
 	import FaVolumeUp from 'svelte-icons/fa/FaVolumeUp.svelte';
 	export let count = 0; // Number of stories
-	export let duration = 3000; // Duration for each story in milliseconds
-	let timers = [];
+	export let duration = 6000; // Duration for each story in milliseconds
 	let progress = Array(count).fill(0);
 	let pausedAt = 0;
 	let paused = true;
@@ -47,7 +46,6 @@
 					if (el.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
 						return resolve();
 					}
-
 					// Wait for readiness
 					const onReady = () => {
 						cleanup();
@@ -70,13 +68,24 @@
 			)
 		);
 	}
+
+	function pauseAudio() {
+		if (audio) {
+			audio.pause();
+			audio.src = '';
+			audio.load();
+		}
+	}
+
 	/**
 	 * @param {string} src
 	 */
 	async function switchAudio(src) {
 		try {
 			// Pause current audio if it's playing
-			audio.pause();
+			if (audio) {
+				audio.pause();
+			}
 
 			// Reset audio element and set new source
 			audio.src = '/songs/' + src + '.mp3';
@@ -143,6 +152,13 @@
 		}
 	});
 
+	function handleAudioLoad() {
+		const firstSong = document.querySelector('[data-story="0"]')?.getAttribute('data-song');
+		if (firstSong) {
+			switchAudio(firstSong).catch((e) => console.warn('Failed to switch audio:', e));
+		}
+	}
+
 	$: if (currentIndex !== undefined) {
 		if (browser) {
 			const stories = document.querySelectorAll('[data-story]');
@@ -151,11 +167,10 @@
 					el.classList.add('active');
 					const song = el.getAttribute('data-song');
 					if (song) {
+						console.log('Switching to song:', song);
 						switchAudio(song).catch((e) => console.warn('Failed to switch audio:', e));
 					} else {
-						audio.pause();
-						audio.src = '';
-						audio.load();
+						pauseAudio();
 					}
 				} else {
 					el.classList.remove('active');
@@ -165,7 +180,7 @@
 	}
 </script>
 
-<audio bind:this={audio}></audio>
+<audio on:load={handleAudioLoad} bind:this={audio}></audio>
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
@@ -181,26 +196,26 @@
 			<div class="bar"><div class="fill" style="width: {p}%"></div></div>
 		{/each}
 	</div>
-	<div class="absolute top-5 right-0 flex items-center justify-between p-4 z-25">
+	<div class="absolute top-5 right-0 flex items-center justify-between p-4 mute-buttons">
 		<div class="w-6 h-6">
 			{#if muted}
-				<FaVolumeMute
-					class="text-white"
+				<button
 					on:click={() => {
-						console.log('unmuted');
-						audio.volume = 1;
 						muted = false;
+						audio.muted = false;
 					}}
-				/>
+				>
+					<FaVolumeMute />
+				</button>
 			{:else}
-				<FaVolumeUp
-					class="text-white"
+				<button
 					on:click={() => {
-						console.log('muted');
-						audio.volume = 0;
 						muted = true;
+						audio.muted = true;
 					}}
-				/>
+				>
+					<FaVolumeUp />
+				</button>
 			{/if}
 		</div>
 	</div>
@@ -215,6 +230,9 @@
 </div>
 
 <style>
+	.mute-buttons {
+		z-index: 100;
+	}
 	.story.active {
 		display: block;
 	}
