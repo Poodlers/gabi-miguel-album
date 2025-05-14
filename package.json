@@ -40,12 +40,14 @@
 		"@vercel/analytics": "^1.4.1",
 		"cloudinary": "^2.5.1",
 		"dayjs": "^1.11.13",
+		"gsap": "^3.13.0",
 		"mongodb": "^6.9.0",
 		"sharp": "^0.33.5",
 		"streamifier": "^0.1.1",
 		"svelte-carousel": "github:vadimkorr/svelte-carousel#pull/142/head",
 		"svelte-icons": "^2.1.0",
 		"svelte-steps": "^2.4.1",
-		"svelte-vertical-timeline": "^1.0.2"
+		"svelte-vertical-timeline": "^1.0.2",
+		"swiper": "^11.2.6"
 	}
 }

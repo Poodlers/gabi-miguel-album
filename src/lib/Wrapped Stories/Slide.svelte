@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 
-	let loaded = false;
+	export let loaded = false;
 
 	/**
 	 * @type {Node}
@@ -31,7 +31,7 @@
 <div
 	bind:this={el}
 	class="slide story"
-	class:active={slideOrder === 0}
+	class:active={slideOrder == 0}
 	data-story={slideOrder}
 	data-song={song}
 >
@@ -48,7 +48,6 @@
 		align-items: center;
 		min-height: 100vh;
 		text-align: center;
-		padding: 2rem;
 		background: linear-gradient(135deg, #ffb6c1, #ffe4e1);
 	}
 </style>

@@ -2,53 +2,72 @@
 	import { fly, fade } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import Slide from './Slide.svelte';
+	import { gsap } from 'gsap';
 
-	let started = false;
+	let loaded = false;
 	let slideOrder = 1;
 
-	onMount(() => {
-		var loaded = true;
-		var el = document.querySelector('.slide[data-story="1"]');
-		if (!el) return;
-		const observer = new MutationObserver(() => {
-			// @ts-ignore
-			if (el.classList.contains('active')) {
-				started = true;
-			} else {
-				started = false;
-			}
+	/**
+	 * @type {any[]}
+	 */
+	let images = [];
+
+	const targets = [
+		{ x: 20, y: 0 },
+		{ x: -20, y: 50 }
+	];
+
+	$: if (loaded) {
+		images.forEach((el, i) => {
+			gsap.fromTo(
+				el,
+				{ x: 0, y: 0, opacity: 0, scale: 0 },
+				{
+					x: targets[i].x,
+					y: targets[i].y,
+					opacity: 1,
+					scale: 1,
+					duration: 1,
+					delay: i * 0.4 + 2,
+					ease: 'power3.out',
+					onComplete: () => {
+						// Wobble / float
+						gsap.to(el, {
+							y: `+=25`,
+							duration: 1.5,
+							ease: 'sine.inOut',
+							repeat: -1,
+							yoyo: true
+						});
+					}
+				}
+			);
 		});
-
-		observer.observe(el, { attributes: true, attributeFilter: ['class'] });
-
-		return () => observer.disconnect();
-	});
+	}
 </script>
 
-<Slide song="" {slideOrder}>
+<Slide song="" {slideOrder} bind:loaded>
 	<div class="container">
 		<!-- Intro Text -->
-		<div class="text-wrapper" class:top={started} transition:fly={{ y: 20, duration: 1500 }}>
-			<h1 class="title">Vamos voltar a onde tudo começou</h1>
-			<p class="subtitle">Mais ou menos há um ano...</p>
+		<div class="text-wrapper" transition:fly={{ y: 200, duration: 2000 }}>
+			<h2 class="font-bold text-2xl mt-1">Vamos voltar a onde tudo começou</h2>
 		</div>
-		<!-- Show images after animation starts -->
-		{#if started}
-			<div class="images" transition:fade>
-				<img class="image" src="/images/memory1.jpg" alt="Memory 1" />
-				<img class="image" src="/images/memory2.jpg" alt="Memory 2" />
-				<img class="image" src="/images/memory3.jpg" alt="Memory 3" />
-			</div>
-		{/if}
+
+		<div class="container">
+			{#each [1, 2] as _, i}
+				<img
+					bind:this={images[i]}
+					class="image"
+					src={'https://placehold.co/600x400'}
+					alt={`photo-${i}`}
+				/>
+			{/each}
+		</div>
 	</div>
 </Slide>
 
 <style>
 	.container {
-		position: relative;
-		min-height: 100vh;
-		overflow: hidden;
-		background: #fef6f9;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -56,15 +75,10 @@
 
 	.text-wrapper {
 		position: absolute;
-		top: 50%;
-		transform: translateY(-50%);
-		text-align: center;
-		transition: top 0.8s ease;
-	}
-
-	.text-wrapper.top {
 		top: 2rem;
-		transform: translateY(0);
+		text-align: center;
+		z-index: 10;
+		transition: top 0.8s ease;
 	}
 
 	.images {
@@ -76,8 +90,7 @@
 	}
 
 	.image {
-		width: 150px;
-		height: 150px;
+		width: 90%;
 		object-fit: cover;
 		border-radius: 1rem;
 		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);

@@ -22,8 +22,10 @@
 	>
 		<Confetti x={[-3, 3]} y={[0, 0.1]} infinite duration="5000" amount="400" fallDistance="100vh" />
 	</div>
-	<h1 in:fly={{ y: 40, duration: 1000 }} class="title">Um ano juntinhos...</h1>
-	<p in:fade={{ delay: 1000, duration: 1000 }} class="subtitle">
-		365 dias, imensas memórias... vamos ver como foi...
-	</p>
+	<div class="p-4">
+		<h1 in:fly={{ y: 40, duration: 1000 }} class="title">Um ano juntinhos...</h1>
+		<p in:fade={{ delay: 1000, duration: 1000 }} class="subtitle">
+			365 dias, imensas memórias... vamos ver como foi...
+		</p>
+	</div>
 </Slide>

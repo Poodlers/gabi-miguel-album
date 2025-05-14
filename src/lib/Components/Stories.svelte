@@ -109,7 +109,7 @@
 
 	function handlePointerUp() {
 		if (paused) {
-			paused = false;
+			paused = true; // MUDAR
 			audio.play().catch((e) => console.warn('Autoplay failed:', e));
 			animateCurrent(performance.now(), (pausedAt / 100) * duration);
 		}
@@ -117,7 +117,7 @@
 
 	function updateProgress() {
 		progress = progress.map((_, i) => (i < currentIndex ? 100 : i === currentIndex ? 0 : 0));
-		animateCurrent(performance.now());
+		if (!paused) animateCurrent(performance.now());
 	}
 
 	/**
@@ -236,7 +236,7 @@
 	.story.active {
 		display: block;
 	}
-	.story-container {
+	.story-wrapper {
 		position: relative;
 		width: 100%;
 		height: 100vh;
@@ -250,9 +250,10 @@
 
 	.overlay {
 		position: absolute;
+		top: 0;
 		width: 100%;
 		height: 100%;
-		z-index: 10;
+		z-index: 15;
 		display: flex;
 		justify-content: space-between;
 	}
