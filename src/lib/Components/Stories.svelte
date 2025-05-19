@@ -22,7 +22,7 @@
 	 */
 	let interval;
 
-	let currentIndex = 0;
+	let currentIndex = 1;
 
 	/**
 	 * @param {number} index
