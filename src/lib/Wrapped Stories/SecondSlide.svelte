@@ -29,6 +29,7 @@
 	let animationsFinished = false;
 
 	$: if (loaded) {
+		animationsFinished = false;
 		gsap.fromTo(
 			initialUpwardsText,
 			{ x: 0, y: 0, opacity: 1, scale: 1 },

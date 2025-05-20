@@ -6,6 +6,7 @@ export default {
 	theme: {
 		colors: {
 			pink: '#E5C2C0',
+			green: '#88D18A',
 			bordeau: {
 				100: '#F9EAE8',
 				200: '#F4D4D0',
