@@ -2,6 +2,7 @@
 	// @ts-nocheck
 
 	import Stories from '$lib/Components/Stories.svelte';
+
 	import IntroSlide from '$lib/Wrapped Stories/IntroSlide.svelte';
 	import SecondSlide from '$lib/Wrapped Stories/SecondSlide.svelte';
 
