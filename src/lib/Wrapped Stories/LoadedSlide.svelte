@@ -35,9 +35,9 @@
 	data-story={slideOrder}
 	data-song={song}
 >
-	{#if loaded}
+	<div class="slide" class:d-none={!loaded}>
 		<slot />
-	{/if}
+	</div>
 </div>
 
 <style>

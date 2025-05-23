@@ -1,5 +1,6 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
+@import 'leaflet/dist/leaflet.css';
 @import 'tailwindcss/utilities';
 
 
@@ -11,6 +12,14 @@
 .incorrect {
 	background-color: #f8d7da;
 	color: #721c24;
+}
+
+.leaflet-top.leaflet-left {
+	display: none;
+}
+
+.leaflet-bottom.leaflet-right {
+	display: none;
 }
 
 body {
