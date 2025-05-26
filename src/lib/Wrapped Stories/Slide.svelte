@@ -31,7 +31,7 @@
 <div
 	bind:this={el}
 	class="slide story"
-	class:active={slideOrder == 4}
+	class:active={slideOrder == 5}
 	data-story={slideOrder}
 	data-song={song}
 >

@@ -9,12 +9,14 @@
 	import SecondSlide from '$lib/Wrapped Stories/SecondSlide.svelte';
 
 	import ThirdSlide from '$lib/Wrapped Stories/ThirdSlide.svelte';
+	import ToiletSlide from '$lib/Wrapped Stories/ToiletSlide.svelte';
 </script>
 
-<Stories count={5}>
+<Stories count={6}>
 	<IntroSlide />
 	<SecondSlide />
 	<ThirdSlide />
 	<QuizSlide />
 	<LeafletSlide />
+	<ToiletSlide />
 </Stories>

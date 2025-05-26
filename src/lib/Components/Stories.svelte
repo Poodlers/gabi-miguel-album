@@ -22,7 +22,7 @@
 	 */
 	let interval;
 
-	let currentIndex = 4;
+	let currentIndex = 5;
 
 	/**
 	 * @param {number} index
@@ -253,7 +253,7 @@
 		top: 0;
 		width: 100%;
 		height: 100%;
-		z-index: 15;
+		z-index: 20;
 		display: flex;
 		justify-content: space-between;
 	}

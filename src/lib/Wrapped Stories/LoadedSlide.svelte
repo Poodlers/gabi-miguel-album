@@ -12,7 +12,6 @@
 	export let song;
 
 	onMount(() => {
-		loaded = true;
 		const observer = new MutationObserver(() => {
 			// @ts-ignore
 			if (el.classList.contains('active')) {
@@ -28,14 +27,8 @@
 	});
 </script>
 
-<div
-	bind:this={el}
-	class="slide story"
-	class:active={slideOrder == 4}
-	data-story={slideOrder}
-	data-song={song}
->
-	<div class="slide" class:d-none={!loaded}>
+<div bind:this={el} class="slide story" data-story={slideOrder} data-song={song}>
+	<div class="slide">
 		<slot />
 	</div>
 </div>

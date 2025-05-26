@@ -16,7 +16,7 @@
 	const locations = [
 		{
 			name: 'Porto, Portugal',
-			coords: [41.1579, -8.6291],
+			coords: [41.1578, -8.6292],
 			image: '/images/porto.jpg'
 		},
 		{
@@ -40,10 +40,9 @@
 
 	function showNextLocation() {
 		if (currentIndex >= locations.length) return;
-
 		const { coords, name, image } = locations[currentIndex];
-		map.flyTo(coords, 13, {
-			duration: 5
+		map.flyTo(coords, 10, {
+			duration: 10
 		});
 
 		const popup = L.popup({ closeButton: false })
@@ -63,16 +62,15 @@
 
 	$: if (loaded) {
 		currentIndex = 0;
+		map = L.map('map').setView([41.1579, -8.6291], 5);
 
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 		// Start showing locations after the map is loaded
 		currentInterval = setTimeout(showNextLocation, 1000);
 	}
 
 	onMount(async () => {
 		L = await import('leaflet');
-		map = L.map('map').setView([41.1579, -8.6291], 5);
-
-		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 	});
 
 	onDestroy(async () => {
@@ -84,7 +82,7 @@
 </script>
 
 <LoadedSlide {song} {slideOrder} bind:loaded>
-	<div id="map" bind:this={mapElement}></div>
+	<div id="map" class:show-map={loaded} bind:this={mapElement}></div>
 </LoadedSlide>
 
 <style>
@@ -95,5 +93,9 @@
 		bottom: 0;
 		border-radius: 1rem;
 		overflow: hidden;
+	}
+
+	.show-map #map {
+		display: block !important;
 	}
 </style>
