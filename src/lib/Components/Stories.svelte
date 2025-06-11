@@ -146,14 +146,18 @@
 
 	onMount(() => {
 		updateProgress();
-		const firstSong = document.querySelector('[data-story="0"]')?.getAttribute('data-song');
+		const firstSong = document
+			.querySelector('[data-story="' + currentIndex + '"]')
+			?.getAttribute('data-song');
 		if (firstSong) {
 			switchAudio(firstSong).catch((e) => console.warn('Failed to switch audio:', e));
 		}
 	});
 
 	function handleAudioLoad() {
-		const firstSong = document.querySelector('[data-story="0"]')?.getAttribute('data-song');
+		const firstSong = document
+			.querySelector('[data-story="' + currentIndex + '"]')
+			?.getAttribute('data-song');
 		if (firstSong) {
 			switchAudio(firstSong).catch((e) => console.warn('Failed to switch audio:', e));
 		}
