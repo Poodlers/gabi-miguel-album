@@ -6,7 +6,7 @@
 	let slideOrder = 5;
 	let loaded = false;
 	let initialText: HTMLDivElement;
-	let images: HTMLImageElement[] = [];
+	let images: HTMLDivElement[] = [];
 	$: if (loaded) {
 		gsap.fromTo(
 			initialText,
@@ -46,12 +46,10 @@
 
 	<div class="toilets">
 		{#each [1, 2, 3, 4, 5] as _, i}
-			<img
-				bind:this={images[i]}
-				class="image"
-				src={'funny_toilet_' + _ + '.jpg'}
-				alt={`photo-${i}`}
-			/>
+			<div class="image-wrapper" bind:this={images[i]}>
+				<p class="image-label">{i + 1}</p>
+				<img class="image" src={'funny_toilet_' + _ + '.jpg'} alt={`photo-${i}`} />
+			</div>
 		{/each}
 	</div>
 </Slide>
@@ -75,11 +73,18 @@
 		justify-content: center;
 		height: 100vh;
 	}
-	.image {
+	.image-wrapper {
 		position: absolute;
+		left: 50%;
 		transform: translate(-50%, -50%);
 		opacity: 0;
-		width: 90%;
+		width: 100%;
+	}
+	.image {
+		width: 100%;
+		position: absolute;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		object-fit: cover;
 		border-radius: 1rem;
 		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
