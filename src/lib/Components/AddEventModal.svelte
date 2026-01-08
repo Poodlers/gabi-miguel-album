@@ -32,8 +32,6 @@
 	export let title: string = '';
 	export let description: string = '';
 	export let date: string = '';
-	
-	let imageAltered: boolean = false;
 
 	let error: string = '';
 	let step = 0;
@@ -65,6 +63,7 @@
 		dayjs.locale('pt');
 		date = date == '' ? dayjs().format('YYYY-MM-DD') : date;
 		window.addEventListener('keydown', handleKeyPress);
+
 		updateClientWidth();
 		return () => {
 			// Cleanup: Remove the event listener when the component is destroyed
@@ -72,50 +71,104 @@
 		};
 	});
 
+	async function uploadToCloudinary(file: File, folder = 'gabi') {
+		const sigRes = await fetch('/cloudinary/sign', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ folder })
+		});
+		if (!sigRes.ok) throw new Error('Failed to get Cloudinary signature');
+		const sig = await sigRes.json();
+
+		const endpoint = `https://api.cloudinary.com/v1_1/${sig.cloudName}/auto/upload`;
+
+		const fd = new FormData();
+		fd.append('file', file);
+		fd.append('api_key', sig.apiKey);
+		fd.append('timestamp', String(sig.timestamp));
+		fd.append('signature', sig.signature);
+		fd.append('folder', sig.folder);
+
+		const upRes = await fetch(endpoint, { method: 'POST', body: fd });
+		if (!upRes.ok) throw new Error(await upRes.text());
+
+		const r = await upRes.json();
+		return {
+			public_id: r.public_id,
+			secure_url: r.secure_url,
+			resource_type: r.resource_type as 'image' | 'video' | 'raw'
+		};
+	}
 	const submitForm = async (event: any) => {
 		event.preventDefault();
-
-		const formData = new FormData();
-		formData.append('id', id);
-		formData.append('author', $userStore.name);
-		formData.append('title', title);
-
-		formData.append('description', description);
-		formData.append('date', date);
+		error = '';
 		loading = true;
-		$files.forEach((file, index) => {
-			if (file.file === null) return;
-			const newFile = new File([file.file!], `${index}_${file.file?.name}`, {
-				type: file.file?.type
-			});
-			file.name = newFile.name;
-			formData.append('files', newFile);
-		});
-		formData.append('newFilesInfo', JSON.stringify($files));
-		formData.append('originalFiles', JSON.stringify(originalPostContent));
 
-		// Make the POST request
-		try{
+		try {
+			// Map original image URL -> public_id (for edit mode)
+			const originalByUrl = new Map<string, string>(
+				(originalPostContent ?? []).map((c) => [c.image, c.public_image_id])
+			);
+
+			const keptPublicIds: string[] = [];
+			const uploaded: {
+				public_id: string;
+				secure_url: string;
+				resource_type: 'image' | 'video' | 'raw';
+			}[] = [];
+
+			// Iterate in the order shown in the UI
+			for (let i = 0; i < $files.length; i++) {
+				const f = $files[i];
+
+				if (f.file) {
+					// NEW file: upload directly
+					const renamed = new File([f.file], `${i}_${f.file.name}`, { type: f.file.type });
+					const r = await uploadToCloudinary(renamed, 'gabi');
+					uploaded.push(r);
+				} else {
+					// EXISTING file: keep it (we need its public_id)
+					const pid = originalByUrl.get(f.src);
+					if (pid) keptPublicIds.push(pid);
+				}
+			}
+
+			const payload: any = {
+				author: $userStore.name,
+				title,
+				description,
+				date,
+				uploaded
+			};
+
+			// Edit mode extras
+			if (id !== '') {
+				payload.id = id;
+				payload.keptPublicIds = keptPublicIds;
+			}
+
 			const response = await fetch('/upload', {
-			method: id === '' ? 'POST' : 'PUT',
-			body: formData
+				method: id === '' ? 'POST' : 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
 			});
-			
 
 			const result = await response.json();
-			console.log(result);
 			error = result.message;
+
 			if (result.success) {
 				loading = false;
 				close();
 				window.location.reload();
+				return;
 			}
-		}catch(e){
-			console.log(e);
-			error = 'Erro ao fazer upload: O limite por upload são 4.5 MB. Por favor, tenta novamente.';
+
+			loading = false;
+		} catch (e: any) {
+			console.error(e);
+			error = e?.message ?? 'Erro ao fazer upload.';
 			loading = false;
 		}
-		
 	};
 </script>
 
@@ -138,12 +191,20 @@
 			<h1 class="text-bordeau-800 font-bold text-2xl">Carregando...</h1>
 		</div>
 	{:else if error}
-	<div class="w-full flex flex-row justify-center items-center my-auto">
-		<svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="red" viewBox="0 0 20 20">
-			<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-		</svg>
-		<p class="text-red-500 text-lg italic font-bold">{error}</p>
-	</div>
+		<div class="w-full flex flex-row justify-center items-center my-auto">
+			<svg
+				class="shrink-0 inline w-4 h-4 me-3"
+				aria-hidden="true"
+				xmlns="http://www.w3.org/2000/svg"
+				fill="red"
+				viewBox="0 0 20 20"
+			>
+				<path
+					d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
+				/>
+			</svg>
+			<p class="text-red-500 text-lg italic font-bold">{error}</p>
+		</div>
 	{:else}
 		{#key step}
 			<div class="my-auto w-full" in:slide={{ axis: 'x' }}>
@@ -209,14 +270,13 @@
 						<FileUploader callback={() => {}} acceptedFileTypes="image/*, video/*" />
 					</div>
 				{/if}
-				
 
 				<div class="flex flex-row justify-between my-5">
 					{#if step > 0}
 						<div class="flex flex-col items-center justify-center">
 							<button
 								class="bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
-			hover:bg-bordeau-500 hover:text-white w-20 
+			hover:bg-bordeau-500 hover:text-white w-20
 			"
 								type="submit"
 								on:click={previousStep}
@@ -228,7 +288,7 @@
 					<div class="flex flex-col items-center justify-end">
 						<button
 							class="bg-bordeau-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
-			hover:bg-bordeau-500 hover:text-white w-20 
+			hover:bg-bordeau-500 hover:text-white w-20
 			"
 							type="submit"
 							on:click={step === steps.length - 1 ? submitForm : nextStep}

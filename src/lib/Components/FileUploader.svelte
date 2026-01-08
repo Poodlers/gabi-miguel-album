@@ -62,7 +62,7 @@
 				.filter((i) => i.kind === 'file')
 				.map((i) => i.getAsFile())
 				.filter((f) => f && f.type && f.type.match(acceptedFileTypes))
-				.map((f) => ({ file: f, type: f!.type, src: URL.createObjectURL(f!) }))
+				.map((f) => ({ file: f, type: f!.type, src: URL.createObjectURL(f!), name: f!.name }))
 		);
 		$files = [...$files];
 		dispatch('drop', e);
@@ -91,7 +91,7 @@
 
 		let customFiles = [];
 		for (const file of filesFromInput) {
-			customFiles.push({ file, type: file.type, src: URL.createObjectURL(file) });
+			customFiles.push({ file, type: file.type, src: URL.createObjectURL(file), name: file.name });
 		}
 		$files = [...$files, ...customFiles];
 	}

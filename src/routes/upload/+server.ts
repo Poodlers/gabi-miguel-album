@@ -1,251 +1,133 @@
-import { v2 as cloudinary } from 'cloudinary';
-import { createReadStream } from 'streamifier';
+import { json } from '@sveltejs/kit';
 import { posts } from '$db/posts';
 import { ObjectId } from 'mongodb';
-import sharp from 'sharp';
+import { v2 as cloudinary } from 'cloudinary';
+import {
+	CLOUDINARY_API_KEY,
+	CLOUDINARY_API_SECRET,
+	CLOUDINARY_CLOUD_NAME
+} from '$env/static/private';
+
+cloudinary.config({
+	cloud_name: CLOUDINARY_CLOUD_NAME,
+	api_key: CLOUDINARY_API_KEY,
+	api_secret: CLOUDINARY_API_SECRET
+});
+
+type UploadedMedia = {
+	resource_type: 'image' | 'video' | 'raw';
+	public_id: string;
+	secure_url: string;
+};
+
+type ContentItem = {
+	resource_type: string;
+	public_image_id: string;
+	image: string;
+};
+
+function toOptimizedContentItem(m: UploadedMedia): ContentItem {
+	const optimizedURL =
+		m.resource_type === 'video'
+			? m.secure_url
+			: cloudinary.url(m.public_id, {
+					quality: 'auto',
+					fetch_format: 'auto',
+					secure: true
+				});
+
+	return {
+		resource_type: m.resource_type,
+		public_image_id: m.public_id,
+		image: optimizedURL
+	};
+}
 
 export const POST = async ({ request }) => {
-	const formData = await request.formData();
-	const date = formData.get('date');
-	const title = formData.get('title');
-	const author = formData.get('author');
-	const description = formData.get('description');
-	const files = formData.getAll('files');
+	const body = await request.json();
 
-	let content = [];
-	const results = [];
-	console.log('formData:', formData);
-	for (const file of files) {
-		const image = file as File;
-		console.log(image.name, image.size);
+	const { date, title, author, description, uploaded } = body as {
+		date?: string;
+		title: string;
+		author: string;
+		description?: string;
+		uploaded: UploadedMedia[];
+	};
 
-		if (!(image instanceof File)) {
-			return new Response(
-				JSON.stringify({
-					error: true,
-					message: 'Invalid file upload'
-				}),
-				{
-					status: 400,
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				}
-			);
-		}
-		//use sharp to resize the image to 800px
-
-		let buffer = new Uint8Array(await image.arrayBuffer());
-		console.log('buffer size before resize:', buffer.length);
-		if (!image.type.includes('video')) {
-			buffer = await sharp(buffer).resize({ width: 800 }).toBuffer();
-			console.log('buffer size after resize:', buffer.length);
-		}
-
-		const result = await new Promise(
-			(
-				resolve: (value: any) => void,
-
-				reject
-			) => {
-				const cld_upload_stream = cloudinary.uploader.upload_stream(
-					{
-						folder: 'gabi',
-						resource_type: 'auto',
-						overwrite: true,
-						width: 800
-					},
-					function (error, result: any) {
-						resolve(result);
-					}
-				);
-
-				createReadStream(buffer).pipe(cld_upload_stream);
-			}
-		);
-		results.push(result);
+	if (!title || !author || !Array.isArray(uploaded)) {
+		return json({ error: true, message: 'Invalid payload' }, { status: 400 });
 	}
 
-	for (const result of results) {
-		console.log('result:', result);
-		const optimizedURL =
-			result.resource_type == 'video'
-				? result.secure_url
-				: cloudinary.url(result.public_id, {
-						quality: 'auto',
-						fetch_format: 'auto',
-						secure: true,
-						width: 800
-					});
-		content.push({
-			resource_type: result.resource_type,
-			public_image_id: result.public_id,
-			image: optimizedURL
-		});
-	}
-	posts.insertOne({
-		content: content,
-		date: date ? new Date(date.toString()) : new Date(),
-		title: title,
-		description: description,
-		author: author,
+	const content = uploaded.map(toOptimizedContentItem);
+
+	await posts.insertOne({
+		content,
+		date: date ? new Date(date) : new Date(),
+		title,
+		description: description ?? '',
+		author,
 		comments: [],
 		likes: 0
 	});
-	return new Response(
-		JSON.stringify({
-			success: true,
-			message: 'Uploads successful'
-		}),
-		{
-			status: 200,
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}
-	);
+
+	return json({ success: true, message: 'Post created' });
 };
 
 export const PUT = async ({ request }) => {
-	const formData = await request.formData();
-	console.log('formData:', formData);
-	const id = formData.get('id') as string | null;
-	if (!id) {
-		return new Response(
-			JSON.stringify({
-				error: true,
-				message: 'Invalid ID'
-			}),
-			{
-				status: 400,
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			}
-		);
-	}
-	const files = formData.getAll('files') as File[];
-	const filesInfo: {
-		file: File | null;
-		type: string;
-		src: string;
-		name: string;
-	}[] = JSON.parse(formData.get('newFilesInfo') as string);
-	const date = formData.get('date');
-	const title = formData.get('title');
-	const description = formData.get('description');
-	const author = formData.get('author');
-	const originalFiles: { public_image_id: string; resource_type: string; image: string }[] =
-		JSON.parse(formData.get('originalFiles') as string);
+	const body = await request.json();
 
-	const originalPost = await posts.findOne({
-		_id: new ObjectId(id)
-	});
-	if (!originalPost) {
-		return new Response(
-			JSON.stringify({
-				error: true,
-				message: 'Post not found'
-			}),
-			{
-				status: 404,
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			}
-		);
+	const { id, date, title, author, description, uploaded, keptPublicIds } = body as {
+		id: string;
+		date?: string;
+		title: string;
+		author: string;
+		description?: string;
+		uploaded: UploadedMedia[];
+		keptPublicIds: string[];
+	};
+
+	if (!id || !title || !author || !Array.isArray(uploaded) || !Array.isArray(keptPublicIds)) {
+		return json({ error: true, message: 'Invalid payload' }, { status: 400 });
 	}
 
-	for (const file of originalFiles) {
-		//destroy the files from the original that are not in the files array
-		if (!filesInfo.find((f) => f.src == file.image)) {
-			await cloudinary.uploader.destroy(file.public_image_id);
-		}
-	}
-	let content = [];
-	let results = [];
-	for (const file of filesInfo) {
-		// upload the files that are not in the originalFiles array
+	const originalPost = await posts.findOne({ _id: new ObjectId(id) });
+	if (!originalPost) return json({ error: true, message: 'Post not found' }, { status: 404 });
 
-		//find corresponding image
-		const correspondingFile = files.find((f: File) => f.name == file.name);
+	const originalContent: any[] = originalPost.content ?? [];
+	const originalPublicIds: string[] = originalContent.map((c) => c.public_image_id);
 
-		if (correspondingFile) {
-			//resize the correspondingFile to 800px
-			let buffer = new Uint8Array(await correspondingFile.arrayBuffer());
-			console.log('buffer size before resize:', buffer.length);
-			if (!correspondingFile.type.includes('video')) {
-				buffer = await sharp(buffer).resize({ width: 800 }).toBuffer();
-				console.log('buffer size after resize:', buffer.length);
-			}
-			const result = await new Promise(
-				(
-					resolve: (value: any) => void,
+	// delete anything removed
+	const toDelete = originalPublicIds.filter((pid) => !keptPublicIds.includes(pid));
 
-					reject
-				) => {
-					const cld_upload_stream = cloudinary.uploader.upload_stream(
-						{
-							folder: 'gabi',
-							resource_type: 'auto',
-							overwrite: true,
-							width: 800
-						},
-						function (error, result: any) {
-							resolve(result);
-						}
-					);
-
-					createReadStream(buffer).pipe(cld_upload_stream);
-				}
-			);
-			results.push(result);
-		} else {
-			const originalImage = originalFiles.find((f) => f.image == file.src);
-			content.push(originalImage);
-		}
+	// safest approach: try both image/video
+	for (const publicId of toDelete) {
+		try {
+			await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+		} catch {}
+		try {
+			await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+		} catch {}
 	}
 
-	for (const result of results) {
-		console.log('result:', result);
-		const optimizedURL =
-			result.resource_type == 'video'
-				? result.secure_url
-				: cloudinary.url(result.public_id, {
-						quality: 'auto',
-						fetch_format: 'auto',
-						secure: true,
-						width: 800
-					});
-		content.push({
-			resource_type: result.resource_type,
-			public_image_id: result.public_id,
-			image: optimizedURL
-		});
-	}
+	// keep in the order provided by the client
+	const originalById = new Map(originalContent.map((c) => [c.public_image_id, c]));
+	const keptContent = keptPublicIds.map((pid) => originalById.get(pid)).filter(Boolean);
 
-	posts.updateOne(
+	const newContent = uploaded.map(toOptimizedContentItem);
+	const content = [...keptContent, ...newContent];
+
+	await posts.updateOne(
 		{ _id: new ObjectId(id) },
 		{
 			$set: {
-				date: new Date(date || originalPost.date),
-				title: title,
-				description: description,
-				content: content,
-				author: author
+				date: date ? new Date(date) : originalPost.date,
+				title,
+				description: description ?? '',
+				content,
+				author
 			}
 		}
 	);
-	return new Response(
-		JSON.stringify({
-			success: true,
-			message: 'Post updated'
-		}),
-		{
-			status: 200,
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}
-	);
+
+	return json({ success: true, message: 'Post updated' });
 };
