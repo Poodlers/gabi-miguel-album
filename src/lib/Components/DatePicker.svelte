@@ -134,70 +134,68 @@
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div
 		id="calendar-modal"
-		class="fixed z-40 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-40 "
+		class="fixed z-40 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-40"
 		bind:this={elModal}
 		on:click={handleClickModal}
 	>
-		
 		<div class="flex items-center justify-center py-8 px-4 my-auto">
-			
 			<div class="max-w-sm w-full shadow-lg">
-				<div class="md:p-8 p-5 dark:bg-gray-800 bg-white rounded-t relative">
-					<button class="absolute top-0 right-0 p-4 close" on:click={() => (isOpenCalendar = false)}>
-		
+				<div class="md:p-8 p-5 light:bg-gray-800 bg-white rounded-t relative">
+					<button
+						class="absolute top-0 right-0 p-4 close"
+						on:click={() => (isOpenCalendar = false)}
+					>
 					</button>
 					<div class="px-4 flex items-center justify-start space-x-4">
-						
-						 <!-- bnt previous -->
-						 <button
-						 type="button"
-						 on:click={previousMonth}
-						 aria-label="calendar backward"
-						 class="text-gray-800"
-					 >
-						 <svg
-							 xmlns="http://www.w3.org/2000/svg"
-							 class="icon icon-tabler icon-tabler-chevron-left"
-							 width="24"
-							 height="24"
-							 viewBox="0 0 24 24"
-							 stroke-width="1.5"
-							 stroke="currentColor"
-							 fill="none"
-							 stroke-linecap="round"
-							 stroke-linejoin="round"
-						 >
-							 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-							 <polyline points="15 6 9 12 15 18" />
-						 </svg>
-					 </button>
+						<!-- bnt previous -->
+						<button
+							type="button"
+							on:click={previousMonth}
+							aria-label="calendar backward"
+							class="text-gray-800"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="icon icon-tabler icon-tabler-chevron-left"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								fill="none"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+								<polyline points="15 6 9 12 15 18" />
+							</svg>
+						</button>
 						<span class="focus:outline-none text-base font-bold text-gray-800"
 							>{ucFirst(dayjs(selectedYear + '-' + selectedMonth).format('MMMM YYYY'))}</span
 						>
-							<!-- bnt next -->
-							<button
-								type="button"
-								on:click={nextMonth}
-								aria-label="calendar forward"
-								class="text-gray-800"
+						<!-- bnt next -->
+						<button
+							type="button"
+							on:click={nextMonth}
+							aria-label="calendar forward"
+							class="text-gray-800"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="icon icon-tabler icon-tabler-chevron-right"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								fill="none"
+								stroke-linecap="round"
+								stroke-linejoin="round"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="icon icon-tabler icon-tabler-chevron-right"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									stroke-width="1.5"
-									stroke="currentColor"
-									fill="none"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-									<polyline points="9 6 15 12 9 18" />
-								</svg>
-							</button>
-						
+								<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+								<polyline points="9 6 15 12 9 18" />
+							</svg>
+						</button>
 					</div>
 					<div class="flex items-center justify-between pt-12 overflow-x-auto">
 						<table class="w-full">
@@ -269,7 +267,6 @@
 	bind:value={inputTxt}
 	on:mousedown={(e) => {
 		e.preventDefault();
-		
 	}}
 	class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 	on:click={(e) => {
@@ -279,8 +276,7 @@
 />
 
 <style>
-
-.close {
+	.close {
 		display: block;
 		box-sizing: border-box;
 		position: absolute;
