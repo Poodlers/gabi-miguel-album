@@ -1,17 +1,27 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { MONGO_URL } from '$env/static/private';
 
-const client = new MongoClient(MONGO_URL, {
-	serverApi: {
-		version: ServerApiVersion.v1,
-		strict: true,
-		deprecationErrors: true
-	}
-});
+if (!MONGO_URL) throw new Error('Missing MONGO_URL');
 
-export function start_mongo(): Promise<MongoClient> {
-	console.log('Connecting to MongoDB...');
-	return client.connect();
+const globalForMongo = globalThis as unknown as {
+	_mongoClientPromise?: Promise<MongoClient>;
+};
+
+function createClient() {
+	return new MongoClient(MONGO_URL, {
+		serverApi: {
+			version: ServerApiVersion.v1,
+			strict: true,
+			deprecationErrors: true
+		}
+	});
 }
 
-export default client.db('gabi');
+export const clientPromise: Promise<MongoClient> =
+	globalForMongo._mongoClientPromise ??
+	(globalForMongo._mongoClientPromise = createClient().connect());
+
+export async function db() {
+	const client = await clientPromise;
+	return client.db('gabi');
+}

@@ -1,5 +1,5 @@
+import { postsCollection } from '$db/posts';
 import { ObjectId } from 'mongodb';
-import { posts } from '$db/posts.js';
 
 export const GET = async ({ url, cookies }) => {
 	const id = url.searchParams.get('id');
@@ -18,6 +18,7 @@ export const GET = async ({ url, cookies }) => {
 			}
 		);
 	}
+	const posts = await postsCollection();
 	const post = await posts.findOne({ _id: new ObjectId(id) });
 	if (!post) {
 		return new Response(

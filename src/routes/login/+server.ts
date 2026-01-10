@@ -1,8 +1,9 @@
-import { users } from '$db/users.js';
+import { usersCollection } from '$db/users';
 import { createHash } from 'crypto';
 
 export const POST = async ({ request, cookies }) => {
 	const { name, password } = await request.json();
+	const users = await usersCollection();
 	const user = await users.findOne({
 		name,
 		password: createHash('sha256')

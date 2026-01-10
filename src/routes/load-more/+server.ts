@@ -1,4 +1,4 @@
-import { posts } from '$db/posts.js';
+import { postsCollection } from '$db/posts';
 
 export const GET = async ({ cookies }) => {
 	const order = cookies.get('order') || '1';
@@ -12,18 +12,19 @@ export const GET = async ({ cookies }) => {
 		httpOnly: true
 	});
 	let pageNumber = cookies.get('pageNumber') as number | undefined;
-    
+
 	if (!pageNumber) {
 		pageNumber = 1;
 	} else {
 		pageNumber++;
 	}
-	
+
 	cookies.set('pageNumber', pageNumber.toString(), {
 		path: '/',
 		httpOnly: true,
 		maxAge: 60 * 60 * 24 * 7
 	});
+	const posts = await postsCollection();
 	const data = await posts
 		.aggregate([
 			{

@@ -1,3 +1,6 @@
-import db from '$db/mongo';
+import { db } from '$db/mongo';
 
-export const users = db.collection('users');
+export async function usersCollection() {
+	const database = await db();
+	return database.collection('users');
+}

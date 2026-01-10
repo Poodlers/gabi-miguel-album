@@ -1,7 +1,10 @@
 import { json } from '@sveltejs/kit';
-import { posts } from '$db/posts';
+import { postsCollection } from '$db/posts';
 import { ObjectId } from 'mongodb';
 import { v2 as cloudinary } from 'cloudinary';
+import { config_cloudinary } from '$db/cloudinary';
+
+config_cloudinary();
 
 type UploadedMedia = {
 	resource_type: 'image' | 'video' | 'raw';
@@ -33,33 +36,48 @@ function toOptimizedContentItem(m: UploadedMedia): ContentItem {
 }
 
 export const POST = async ({ request }) => {
-	const body = await request.json();
-
-	const { date, title, author, description, uploaded } = body as {
-		date?: string;
-		title: string;
-		author: string;
-		description?: string;
-		uploaded: UploadedMedia[];
-	};
-
-	if (!author || !Array.isArray(uploaded)) {
-		return json({ error: true, message: 'Invalid payload' }, { status: 400 });
+	let body: any;
+	try {
+		body = await request.json();
+	} catch (e: any) {
+		return json({ error: true, message: 'Invalid JSON body' }, { status: 400 });
 	}
 
-	const content = uploaded.map(toOptimizedContentItem);
+	try {
+		const { date, title, author, description, uploaded } = body as {
+			date?: string;
+			title?: string;
+			author?: string;
+			description?: string;
+			uploaded?: UploadedMedia[];
+		};
 
-	await posts.insertOne({
-		content,
-		date: date ? new Date(date) : new Date(),
-		title,
-		description: description ?? '',
-		author,
-		comments: [],
-		likes: 0
-	});
+		if (!author || !Array.isArray(uploaded)) {
+			return json({ error: true, message: 'Invalid payload' }, { status: 400 });
+		}
 
-	return json({ success: true, message: 'Post created' });
+		const content = uploaded.map((m) => {
+			if (!m?.public_id || !m?.secure_url || !m?.resource_type) {
+				throw new Error(`Bad uploaded item: ${JSON.stringify(m)}`);
+			}
+			return toOptimizedContentItem(m);
+		});
+		const posts = await postsCollection();
+		await posts.insertOne({
+			content,
+			date: date ? new Date(date) : new Date(),
+			title: title ?? '',
+			description: description ?? '',
+			author,
+			comments: [],
+			likes: 0
+		});
+
+		return json({ success: true, message: 'Post created' });
+	} catch (e: any) {
+		console.error('POST /upload failed:', e?.stack || e);
+		return json({ error: true, message: e?.message ?? 'Internal server error' }, { status: 500 });
+	}
 };
 
 export const PUT = async ({ request }) => {
@@ -78,7 +96,7 @@ export const PUT = async ({ request }) => {
 	if (!id || !author || !Array.isArray(uploaded) || !Array.isArray(keptPublicIds)) {
 		return json({ error: true, message: 'Invalid payload' }, { status: 400 });
 	}
-
+	const posts = await postsCollection();
 	const originalPost = await posts.findOne({ _id: new ObjectId(id) });
 	if (!originalPost) return json({ error: true, message: 'Post not found' }, { status: 404 });
 

@@ -1,5 +1,8 @@
 import { json } from '@sveltejs/kit';
 import { v2 as cloudinary } from 'cloudinary';
+import { config_cloudinary } from '$db/cloudinary';
+
+config_cloudinary();
 
 export const POST = async ({ request }) => {
 	const { publicIds } = await request.json();

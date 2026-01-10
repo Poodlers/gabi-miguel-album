@@ -1,8 +1,12 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { posts } from '$db/posts';
+import { postsCollection } from '$db/posts';
 import { ObjectId } from 'mongodb';
+import { config_cloudinary } from '$db/cloudinary';
+
+config_cloudinary();
 
 export const DELETE = async ({ url, request }) => {
+	const posts = await postsCollection();
 	const id = url.searchParams.get('post');
 
 	const data = await request.json();
@@ -24,7 +28,7 @@ export const DELETE = async ({ url, request }) => {
 		);
 	}
 
-	posts.deleteOne({ _id: new ObjectId(id) }).then((result) => {
+	posts.deleteOne({ _id: new ObjectId(id) }).then((result: { deletedCount: number }) => {
 		console.log(result);
 		if (result.deletedCount === 0) {
 			return new Response(

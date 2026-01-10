@@ -1,10 +1,11 @@
-import { posts } from '$db/posts';
+import { postsCollection } from '$db/posts';
 import { randomUUID } from 'crypto';
 import { ObjectId } from 'mongodb';
 
 export const POST = async ({ request, cookies }) => {
 	const { content, postId, parentId } = await request.json();
 	const user = cookies.get('user');
+	const posts = await postsCollection();
 	if (!parentId) {
 		posts.updateOne(
 			{ _id: new ObjectId(postId) },
@@ -46,6 +47,7 @@ export const POST = async ({ request, cookies }) => {
 export const DELETE = async ({ request, cookies }) => {
 	const { commentId, postId, parentCommentId } = await request.json();
 	const user = cookies.get('user');
+	const posts = await postsCollection();
 	const post = await posts.findOne({ _id: new ObjectId(postId) });
 	if (!post) {
 		return new Response('Post not found', { status: 404 });

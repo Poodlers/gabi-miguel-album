@@ -1,7 +1,9 @@
 import type { PageServerLoad } from './$types';
-import { posts } from '$db/posts';
+import { postsCollection } from '$db/posts';
 import type { Post } from '$lib/Models/Post';
 import type { User } from '$lib/Models/User';
+
+const posts = await postsCollection();
 
 export const load = (async ({
 	cookies,

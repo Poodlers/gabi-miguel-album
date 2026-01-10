@@ -1,8 +1,8 @@
-import { posts } from '$db/posts';
 import type { Post } from '$lib/Models/Post';
 import { ObjectId } from 'mongodb';
 import type { PageServerLoad } from './$types';
 import type { User } from '$lib/Models/User';
+import { postsCollection } from '$db/posts';
 
 export const load = (async ({
 	cookies,
@@ -10,6 +10,7 @@ export const load = (async ({
 }): Promise<{ post: Post; user: User; currentPage: number }> => {
 	const postId = params.postId;
 	const user = cookies.get('user');
+	const posts = await postsCollection();
 	const post = await posts.findOne({
 		_id: new ObjectId(postId)
 	});
