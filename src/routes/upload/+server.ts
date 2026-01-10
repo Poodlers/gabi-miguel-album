@@ -2,17 +2,6 @@ import { json } from '@sveltejs/kit';
 import { posts } from '$db/posts';
 import { ObjectId } from 'mongodb';
 import { v2 as cloudinary } from 'cloudinary';
-import {
-	CLOUDINARY_API_KEY,
-	CLOUDINARY_API_SECRET,
-	CLOUDINARY_CLOUD_NAME
-} from '$env/static/private';
-
-cloudinary.config({
-	cloud_name: CLOUDINARY_CLOUD_NAME,
-	api_key: CLOUDINARY_API_KEY,
-	api_secret: CLOUDINARY_API_SECRET
-});
 
 type UploadedMedia = {
 	resource_type: 'image' | 'video' | 'raw';
@@ -54,7 +43,7 @@ export const POST = async ({ request }) => {
 		uploaded: UploadedMedia[];
 	};
 
-	if (!title || !author || !Array.isArray(uploaded)) {
+	if (!author || !Array.isArray(uploaded)) {
 		return json({ error: true, message: 'Invalid payload' }, { status: 400 });
 	}
 
@@ -86,7 +75,7 @@ export const PUT = async ({ request }) => {
 		keptPublicIds: string[];
 	};
 
-	if (!id || !title || !author || !Array.isArray(uploaded) || !Array.isArray(keptPublicIds)) {
+	if (!id || !author || !Array.isArray(uploaded) || !Array.isArray(keptPublicIds)) {
 		return json({ error: true, message: 'Invalid payload' }, { status: 400 });
 	}
 
