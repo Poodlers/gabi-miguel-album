@@ -1,6 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import Stories from 'react-insta-stories';
+import SoundtrackRankingSlide from './slides/SoundtrackRankingSlide';
 import IntroSlide from './slides/IntroSlide';
+import TimeAnchorSlide from './slides/TimeAnchorSlide';
 
 type StoryAudio = {
 	songLabel?: string;
@@ -17,6 +19,7 @@ type AppStory = StoryAudio & {
 export default function StoriesApp() {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isPaused, setIsPaused] = useState(false);
+
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 
 	const appStories: AppStory[] = useMemo(
@@ -32,13 +35,23 @@ export default function StoriesApp() {
 				)
 			},
 			{
-				duration: 5000,
+				duration: 10000,
 				songLabel: 'Song name — Artist name',
-				songSrc: '/songs/intro.mp3',
-				startSecond: 12,
+				songSrc: '/songs/your-song.mp3',
+				startSecond: 24,
+				volume: 0.72,
+				render: ({ isPaused, songLabel }) => (
+					<TimeAnchorSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
+				)
+			},
+			{
+				duration: 999999,
+				songLabel: 'Your soundtrack song — Artist',
+				songSrc: '/songs/soundtrack.mp3',
+				startSecond: 18,
 				volume: 0.7,
 				render: ({ isPaused, songLabel }) => (
-					<IntroSlide isPaused={isPaused} songLabel={songLabel} />
+					<SoundtrackRankingSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
 				)
 			}
 		],
