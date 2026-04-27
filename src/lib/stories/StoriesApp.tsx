@@ -3,6 +3,8 @@ import Stories from 'react-insta-stories';
 import SoundtrackRankingSlide from './slides/SoundtrackRankingSlide';
 import IntroSlide from './slides/IntroSlide';
 import TimeAnchorSlide from './slides/TimeAnchorSlide';
+import MapJourneySlide from './slides/MapJourneySlide';
+import type { MapStoryPlace } from './slides/map/types';
 
 type StoryAudio = {
 	songLabel?: string;
@@ -21,6 +23,25 @@ export default function StoriesApp() {
 	const [isPaused, setIsPaused] = useState(false);
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
+
+	const journeyPlaces: MapStoryPlace[] = [
+		{
+			id: 'lisbon',
+			name: 'Lisboa',
+			country: 'Portugal',
+			coordinates: { lat: 38.7223, lng: -9.1393 },
+			photos: ['/moments/lisbon/photo-1.jpg', '/moments/lisbon/photo-2.jpg'],
+			text: 'Onde começámos a construir esta história.'
+		},
+		{
+			id: 'berlin',
+			name: 'Berlim',
+			country: 'Alemanha',
+			coordinates: { lat: 52.52, lng: 13.405 },
+			photos: ['/moments/berlin/photo-1.jpg', '/moments/berlin/photo-2.jpg'],
+			text: 'Mesmo longe, havia sempre um bocadinho de nós aqui.'
+		}
+	];
 
 	const appStories: AppStory[] = useMemo(
 		() => [

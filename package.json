@@ -52,12 +52,14 @@
 		"mongodb": "^6.9.0",
 		"react": "^19.2.5",
 		"react-dom": "^19.2.5",
+		"react-globe.gl": "^2.37.1",
 		"react-insta-stories": "^2.8.0",
 		"streamifier": "^0.1.1",
 		"svelte-carousel": "github:vadimkorr/svelte-carousel#pull/142/head",
 		"svelte-icons": "^2.1.0",
 		"svelte-steps": "^2.4.1",
 		"svelte-vertical-timeline": "^1.0.2",
-		"swiper": "^11.2.6"
+		"swiper": "^11.2.6",
+		"three": "^0.184.0"
 	}
 }
