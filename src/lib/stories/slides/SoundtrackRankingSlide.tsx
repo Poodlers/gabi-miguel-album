@@ -148,7 +148,6 @@ export default function SoundtrackRankingSlide({
 	}, [phase]);
 
 	const goToRanking = () => {
-		console.log('Go to ranking');
 		const tl = gsap.timeline({
 			onComplete: () => {
 				setPhase('ranking');

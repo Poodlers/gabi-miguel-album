@@ -5,6 +5,8 @@ import IntroSlide from './slides/IntroSlide';
 import TimeAnchorSlide from './slides/TimeAnchorSlide';
 import MapJourneySlide from './slides/MapJourneySlide';
 import type { MapStoryPlace } from './slides/map/types';
+import DistanceSlide from './slides/DistanceSlide';
+import LongDistanceRitualsSlide from './slides/LongDistanceRitualsSlide';
 
 type StoryAudio = {
 	songLabel?: string;
@@ -43,6 +45,34 @@ export default function StoriesApp() {
 		}
 	];
 
+	const watchedSeries = [
+		{
+			id: 'severance',
+			name: 'Severance',
+			image: '/series/severance.jpg'
+		},
+		{
+			id: 'death-note',
+			name: 'Death Note',
+			image: '/series/death-note.jpg'
+		},
+		{
+			id: 'modern-family',
+			name: 'Modern Family',
+			image: '/series/modern-family.jpg'
+		},
+		{
+			id: 'arcane',
+			name: 'Arcane',
+			image: '/series/arcane.jpg'
+		},
+		{
+			id: 'the-office',
+			name: 'The Office',
+			image: '/series/the-office.jpg'
+		}
+	];
+
 	const appStories: AppStory[] = useMemo(
 		() => [
 			{
@@ -66,6 +96,46 @@ export default function StoriesApp() {
 				)
 			},
 			{
+				duration: 11000,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/distance-song.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<DistanceSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
+				)
+			},
+			{
+				duration: 15000,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/rituals.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<LongDistanceRitualsSlide
+						isPaused={isPaused}
+						songLabel={songLabel ?? ''}
+						watchedSeries={watchedSeries}
+					/>
+				)
+			},
+			{
+				duration:
+					4000 +
+					journeyPlaces.reduce(
+						(total, place) =>
+							total + 2700 + 850 + 1000 + Math.max(place.photos.length, 1) * 3250 + 1650,
+						0
+					),
+				songLabel: 'Around the World — Daft Punk',
+				songSrc: '/songs/map-song.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<MapJourneySlide isPaused={isPaused} songLabel={songLabel ?? ''} places={journeyPlaces} />
+				)
+			}
+			/*{
 				duration: 999999,
 				songLabel: 'Your soundtrack song — Artist',
 				songSrc: '/songs/soundtrack.mp3',
@@ -74,7 +144,7 @@ export default function StoriesApp() {
 				render: ({ isPaused, songLabel }) => (
 					<SoundtrackRankingSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
 				)
-			}
+			} */
 		],
 		[isPaused]
 	);

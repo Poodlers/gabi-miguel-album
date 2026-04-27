@@ -8,9 +8,10 @@ type MapJourneySlideProps = {
 	isPaused: boolean;
 	songLabel: string;
 	places: MapStoryPlace[];
-	requestPause?: (paused: boolean) => void;
 	onComplete?: () => void;
 };
+
+type Phase = 'title' | 'journey';
 
 type GlobePoint = {
 	id: string;
@@ -20,27 +21,31 @@ type GlobePoint = {
 	color: string;
 };
 
+const TITLE_DURATION = 4;
+const PHOTO_DURATION = 2.5;
+
 export default function MapJourneySlide({
 	isPaused,
 	songLabel,
 	places,
-	requestPause,
 	onComplete
 }: MapJourneySlideProps) {
 	const globeRef = useRef<any>(null);
 	const rootRef = useRef<HTMLDivElement | null>(null);
+	const titleCardRef = useRef<HTMLDivElement | null>(null);
 	const placeLabelRef = useRef<HTMLDivElement | null>(null);
-	const contentRef = useRef<HTMLDivElement | null>(null);
-	const photosRef = useRef<HTMLDivElement | null>(null);
-	const textRef = useRef<HTMLDivElement | null>(null);
-	const leftCloudRef = useRef<HTMLDivElement | null>(null);
-	const rightCloudRef = useRef<HTMLDivElement | null>(null);
+	const photoStageRef = useRef<HTMLDivElement | null>(null);
+	const photoRef = useRef<HTMLImageElement | null>(null);
+	const textCardRef = useRef<HTMLDivElement | null>(null);
 
 	const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
+	const [phase, setPhase] = useState<Phase>('title');
 	const [currentPlaceIndex, setCurrentPlaceIndex] = useState(0);
+	const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
 	const currentPlace = places[currentPlaceIndex];
+	const currentPhoto = currentPlace?.photos[currentPhotoIndex];
 
 	const points: GlobePoint[] = useMemo(
 		() =>
@@ -53,15 +58,6 @@ export default function MapJourneySlide({
 			})),
 		[places]
 	);
-
-	useEffect(() => {
-		requestPause?.(true);
-
-		return () => {
-			requestPause?.(false);
-			timelineRef.current?.kill();
-		};
-	}, [requestPause]);
 
 	useEffect(() => {
 		if (!globeRef.current) return;
@@ -85,12 +81,46 @@ export default function MapJourneySlide({
 	}, []);
 
 	useEffect(() => {
+		const ctx = gsap.context(() => {
+			gsap.set(titleCardRef.current, {
+				opacity: 0,
+				y: 32,
+				scale: 0.96
+			});
+
+			gsap.to(titleCardRef.current, {
+				opacity: 1,
+				y: 0,
+				scale: 1,
+				duration: 1,
+				ease: 'power3.out'
+			});
+
+			gsap.to(titleCardRef.current, {
+				opacity: 0,
+				y: -24,
+				scale: 0.98,
+				duration: 0.7,
+				delay: TITLE_DURATION - 0.7,
+				ease: 'power2.in',
+				onComplete: () => setPhase('journey')
+			});
+		}, rootRef);
+
+		return () => ctx.revert();
+	}, []);
+
+	useEffect(() => {
+		if (phase !== 'journey') return;
 		if (!currentPlace || !globeRef.current) return;
 
 		timelineRef.current?.kill();
+		setCurrentPhotoIndex(0);
+
+		const photoCount = Math.max(currentPlace.photos.length, 1);
 
 		const ctx = gsap.context(() => {
-			gsap.set([placeLabelRef.current, contentRef.current], {
+			gsap.set([placeLabelRef.current, photoStageRef.current, textCardRef.current], {
 				opacity: 0
 			});
 
@@ -99,19 +129,14 @@ export default function MapJourneySlide({
 				scale: 0.96
 			});
 
-			gsap.set(contentRef.current, {
-				y: 34,
-				scale: 0.98
+			gsap.set(photoStageRef.current, {
+				scale: 0,
+				opacity: 0,
+				transformOrigin: 'center center'
 			});
 
-			gsap.set(leftCloudRef.current, {
-				x: '-110%',
-				opacity: 0
-			});
-
-			gsap.set(rightCloudRef.current, {
-				x: '110%',
-				opacity: 0
+			gsap.set(textCardRef.current, {
+				y: 24
 			});
 
 			const tl = gsap.timeline({
@@ -122,7 +147,6 @@ export default function MapJourneySlide({
 					if (nextIndex < places.length) {
 						setCurrentPlaceIndex(nextIndex);
 					} else {
-						requestPause?.(false);
 						onComplete?.();
 					}
 				}
@@ -147,111 +171,98 @@ export default function MapJourneySlide({
 					opacity: 1,
 					y: 0,
 					scale: 1,
-					duration: 0.9,
+					duration: 0.85,
 					ease: 'back.out(1.7)'
-				})
+				});
 
-				.to(placeLabelRef.current, {
-					scale: 1.04,
-					duration: 0.7,
-					yoyo: true,
-					repeat: 1,
-					ease: 'sine.inOut'
-				})
-
-				.to(
-					contentRef.current,
+			if (currentPlace.text.trim()) {
+				tl.to(
+					textCardRef.current,
 					{
 						opacity: 1,
 						y: 0,
-						scale: 1,
-						duration: 1,
-						ease: 'power3.out'
-					},
-					'+=0.3'
-				)
-
-				.fromTo(
-					photosRef.current?.children ?? [],
-					{
-						opacity: 0,
-						y: 28,
-						rotate: -4,
-						scale: 0.92
-					},
-					{
-						opacity: 1,
-						y: 0,
-						rotate: 0,
-						scale: 1,
-						duration: 0.8,
-						stagger: 0.18,
-						ease: 'back.out(1.5)'
-					},
-					'-=0.4'
-				)
-
-				.fromTo(
-					textRef.current,
-					{
-						opacity: 0,
-						y: 18
-					},
-					{
-						opacity: 1,
-						y: 0,
-						duration: 0.8,
+						duration: 0.75,
 						ease: 'power2.out'
 					},
 					'-=0.35'
-				)
+				);
+			}
 
-				.to({}, { duration: 3.2 })
+			for (let i = 0; i < photoCount; i += 1) {
+				tl.call(() => {
+					setCurrentPhotoIndex(i);
+				});
 
-				.to([placeLabelRef.current, contentRef.current], {
-					opacity: 0,
-					y: -18,
-					duration: 0.65,
-					ease: 'power2.in'
-				})
+				if (i === 0) {
+					tl.fromTo(
+						photoStageRef.current,
+						{
+							opacity: 0,
+							scale: 0.72,
+							xPercent: 0
+						},
+						{
+							opacity: 1,
+							scale: 1,
+							xPercent: 0,
+							duration: 0.8,
+							ease: 'back.out(1.5)'
+						}
+					);
+				} else {
+					tl.fromTo(
+						photoStageRef.current,
+						{
+							xPercent: 130,
+							opacity: 1,
+							scale: 0.96
+						},
+						{
+							xPercent: 0,
+							opacity: 1,
+							scale: 1,
+							duration: 0.75,
+							ease: 'power3.out'
+						}
+					);
+				}
 
-				.to(
-					[leftCloudRef.current, rightCloudRef.current],
-					{
-						x: '0%',
+				tl.to({}, { duration: PHOTO_DURATION });
+
+				if (i < photoCount - 1) {
+					tl.to(photoStageRef.current, {
+						xPercent: -130,
 						opacity: 1,
-						duration: 1,
-						ease: 'power2.inOut'
-					},
-					'-=0.25'
-				)
+						scale: 0.96,
+						duration: 0.65,
+						ease: 'power3.in'
+					});
+				}
+			}
+
+			tl.to([placeLabelRef.current, photoStageRef.current, textCardRef.current], {
+				opacity: 0,
+				y: -18,
+				duration: 0.65,
+				ease: 'power2.in'
+			})
 
 				.call(() => {
 					globeRef.current.pointOfView(
 						{
 							lat: currentPlace.coordinates.lat,
 							lng: currentPlace.coordinates.lng,
-							altitude: 2.2
+							altitude: 2.1
 						},
 						900
 					);
 				})
 
-				.to({}, { duration: 0.95 })
-
-				.to(
-					[leftCloudRef.current, rightCloudRef.current],
-					{
-						opacity: 0,
-						duration: 0.55,
-						ease: 'power2.out'
-					},
-					'+=0.15'
-				);
+				.to({}, { duration: 1 });
 		}, rootRef);
 
 		return () => ctx.revert();
-	}, [currentPlaceIndex, currentPlace, places.length, isPaused, requestPause, onComplete]);
+	}, [phase, currentPlaceIndex, currentPlace, places.length, isPaused, onComplete]);
 
 	useEffect(() => {
 		const tl = timelineRef.current;
@@ -261,9 +272,7 @@ export default function MapJourneySlide({
 		else tl.resume();
 	}, [isPaused]);
 
-	if (!currentPlace) {
-		return null;
-	}
+	if (!currentPlace) return null;
 
 	return (
 		<div ref={rootRef} style={styles.slide}>
@@ -304,43 +313,46 @@ export default function MapJourneySlide({
 				/>
 			</div>
 
-			<div ref={placeLabelRef} style={styles.placeLabel}>
-				<div style={styles.pin}>📍</div>
-				<div>
-					<div style={styles.placeName}>{currentPlace.name}</div>
-					{currentPlace.country ? (
-						<div style={styles.placeCountry}>{currentPlace.country}</div>
+			{phase === 'title' && (
+				<div ref={titleCardRef} style={styles.titleCard}>
+					<div style={styles.title}>A nossa relação à volta do mundo</div>
+					<div style={styles.subtitle}>vamos ver onde estivemos?</div>
+				</div>
+			)}
+
+			{phase === 'journey' && (
+				<>
+					<div ref={placeLabelRef} style={styles.placeLabel}>
+						<div style={styles.pin}>📍</div>
+						<div>
+							<div style={styles.placeName}>{currentPlace.name}</div>
+							{currentPlace.country ? (
+								<div style={styles.placeCountry}>{currentPlace.country}</div>
+							) : null}
+						</div>
+					</div>
+
+					{currentPhoto ? (
+						<div style={styles.photoStageWrapper}>
+							<div ref={photoStageRef} style={styles.photoStage}>
+								<img
+									ref={photoRef}
+									key={`${currentPlace.id}-${currentPhotoIndex}`}
+									src={currentPhoto}
+									alt={`${currentPlace.name} ${currentPhotoIndex + 1}`}
+									style={styles.photo}
+								/>
+							</div>
+						</div>
 					) : null}
-				</div>
-			</div>
 
-			<div ref={contentRef} style={styles.contentCard}>
-				<div ref={photosRef} style={styles.photos}>
-					{currentPlace.photos.slice(0, 2).map((photo, index) => (
-						<img
-							key={`${currentPlace.id}-${photo}`}
-							src={photo}
-							alt={`${currentPlace.name} ${index + 1}`}
-							style={{
-								...styles.photo,
-								transform: index % 2 === 0 ? 'rotate(-3deg)' : 'rotate(3deg)'
-							}}
-						/>
-					))}
-				</div>
-
-				<div ref={textRef} style={styles.placeText}>
-					{currentPlace.text}
-				</div>
-			</div>
-
-			<div ref={leftCloudRef} style={{ ...styles.cloudLayer, ...styles.leftClouds }}>
-				☁️ ☁️ ☁️
-			</div>
-
-			<div ref={rightCloudRef} style={{ ...styles.cloudLayer, ...styles.rightClouds }}>
-				☁️ ☁️ ☁️
-			</div>
+					{currentPlace.text.trim() ? (
+						<div ref={textCardRef} style={styles.textCard}>
+							{currentPlace.text}
+						</div>
+					) : null}
+				</>
+			)}
 		</div>
 	);
 }
@@ -361,6 +373,35 @@ const styles: Record<string, React.CSSProperties> = {
 		position: 'absolute',
 		inset: 0,
 		zIndex: 1
+	},
+
+	titleCard: {
+		position: 'absolute',
+		inset: 0,
+		zIndex: 8,
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+		padding: 28,
+		textAlign: 'center',
+		background:
+			'radial-gradient(circle at center, rgba(255, 126, 182, 0.18), rgba(5, 7, 17, 0.68) 58%, rgba(5, 7, 17, 0.92) 100%)'
+	},
+
+	title: {
+		maxWidth: 820,
+		fontSize: 'clamp(2.2rem, 7vw, 5rem)',
+		lineHeight: 1,
+		fontWeight: 900,
+		textShadow: '0 18px 42px rgba(0,0,0,0.32)'
+	},
+
+	subtitle: {
+		marginTop: 18,
+		fontSize: 'clamp(1.15rem, 3vw, 2rem)',
+		color: '#ffd8e9',
+		fontWeight: 700
 	},
 
 	placeLabel: {
@@ -401,70 +442,50 @@ const styles: Record<string, React.CSSProperties> = {
 		fontSize: 13,
 		color: 'rgba(255,255,255,0.72)'
 	},
-
-	contentCard: {
+	photoStageWrapper: {
 		position: 'absolute',
 		left: '50%',
-		bottom: 56,
+		top: '51%',
+		transform: 'translate(-50%, -50%)',
 		zIndex: 6,
-		transform: 'translateX(-50%)',
-		width: 'min(92vw, 760px)',
-		padding: 18,
-		borderRadius: 30,
-		background: 'rgba(13, 17, 31, 0.68)',
-		border: '1px solid rgba(255,255,255,0.14)',
-		backdropFilter: 'blur(18px)',
-		boxShadow: '0 24px 70px rgba(0,0,0,0.34)'
+		width: 'min(86vw, 520px)',
+		height: 'min(58vh, 620px)'
 	},
 
-	photos: {
-		display: 'flex',
-		justifyContent: 'center',
-		gap: 16,
-		marginBottom: 16
+	photoStage: {
+		width: '100%',
+		height: '100%',
+		borderRadius: 34,
+		overflow: 'hidden',
+		background: 'rgba(255,255,255,0.08)',
+		border: '1px solid rgba(255,255,255,0.16)',
+		boxShadow: '0 28px 80px rgba(0,0,0,0.42)'
 	},
 
 	photo: {
-		width: 'min(38vw, 230px)',
-		aspectRatio: '4 / 5',
+		width: '100%',
+		height: '100%',
 		objectFit: 'cover',
-		borderRadius: 24,
-		border: '5px solid rgba(255,255,255,0.92)',
-		boxShadow: '0 14px 34px rgba(0,0,0,0.28)'
+		display: 'block'
 	},
 
-	placeText: {
-		fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+	textCard: {
+		position: 'absolute',
+		left: '50%',
+		bottom: 36,
+		zIndex: 7,
+		transform: 'translateX(-50%)',
+		width: 'min(88vw, 660px)',
+		padding: '16px 18px',
+		borderRadius: 24,
+		background: 'rgba(13, 17, 31, 0.72)',
+		border: '1px solid rgba(255,255,255,0.14)',
+		backdropFilter: 'blur(16px)',
+		boxShadow: '0 18px 50px rgba(0,0,0,0.28)',
+		fontSize: 'clamp(0.98rem, 2vw, 1.18rem)',
 		lineHeight: 1.45,
 		fontWeight: 650,
 		textAlign: 'center',
 		color: '#ffe7f1'
-	},
-
-	cloudLayer: {
-		position: 'absolute',
-		top: 0,
-		bottom: 0,
-		zIndex: 20,
-		width: '60%',
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		fontSize: 'clamp(5rem, 18vw, 13rem)',
-		filter: 'blur(1px)',
-		textShadow: '0 20px 40px rgba(255,255,255,0.18)',
-		pointerEvents: 'none'
-	},
-
-	leftClouds: {
-		left: 0,
-		background:
-			'linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.82) 52%, rgba(255,255,255,0) 100%)'
-	},
-
-	rightClouds: {
-		right: 0,
-		background:
-			'linear-gradient(270deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.82) 52%, rgba(255,255,255,0) 100%)'
 	}
 };
