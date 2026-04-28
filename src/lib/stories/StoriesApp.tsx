@@ -7,6 +7,10 @@ import MapJourneySlide from './slides/MapJourneySlide';
 import type { MapStoryPlace } from './slides/map/types';
 import DistanceSlide from './slides/DistanceSlide';
 import LongDistanceRitualsSlide from './slides/LongDistanceRitualsSlide';
+import StatsSlide from './slides/StatsSlide';
+import CoreMemoriesSlide, { type CoreMemory } from './slides/CoreMemoriesSlide';
+import QuizSlide, { type QuizQuestion } from './slides/QuizSlide';
+import SmallThingsSlide, { type SmallThing } from './slides/SmallThingsSlide';
 
 type StoryAudio = {
 	songLabel?: string;
@@ -24,7 +28,122 @@ export default function StoriesApp() {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isPaused, setIsPaused] = useState(false);
 
+	const goNextStory = () => {
+		setCurrentIndex((prev) => prev + 1);
+	};
+
 	const audioRef = useRef<HTMLAudioElement | null>(null);
+
+	const gabiSmallThings: SmallThing[] = [
+		{
+			id: 'cabeca',
+			emoji: '💆‍♀️',
+			text: 'gostas de ser coçada no couro cabeludo'
+		},
+		{
+			id: 'borbulhas',
+			emoji: '😈',
+			text: 'gostas demasiado de espremer borbulhas'
+		},
+		{
+			id: 'voz-fofa',
+			emoji: '🥺',
+			text: 'fazes uma voz fofa quando vês algo fofo'
+		},
+		{
+			id: 'solucos',
+			emoji: '🤭',
+			text: 'os teus soluçinhos fofos'
+		},
+		{
+			id: 'ah',
+			emoji: '😮',
+			text: 'o “ahhhh” quando algo te surpreende'
+		},
+		{
+			id: 'riso',
+			emoji: '✨',
+			text: 'tens um riso mesmo muito fofo'
+		},
+		{
+			id: 'danca',
+			emoji: '💃',
+			text: 'melhores passos de dança'
+		},
+		{
+			id: 'sono',
+			emoji: '🛌',
+			text: 'amas dormir e reclamar para sair da cama'
+		},
+		{
+			id: 'doces',
+			emoji: '🍦',
+			text: 'amas doces, panquecas e gelados'
+		},
+		{
+			id: 'fotos',
+			emoji: '📸',
+			text: 'tens talento para tirar fotos lindas'
+		},
+		{
+			id: 'banhos',
+			emoji: '🔥',
+			text: 'banhos a escaldar, preparação para o inferno'
+		}
+	];
+
+	const quizQuestions: QuizQuestion[] = [
+		{
+			id: 'first-series',
+			question: 'Qual foi a primeira série que vimos juntos?',
+			correct: 0,
+			answers: ['Severance', 'Death Note', 'Modern Family', 'Foi o telejornal sem querer']
+		},
+		{
+			id: 'first-meeting',
+			question: 'Lembras-te do dia em que nos conhecemos?',
+			correct: 1,
+			answers: [
+				'Não, foi tudo um sonho',
+				'Claro que sim',
+				'Só lembro do outfit',
+				'Ainda estou a processar'
+			]
+		}
+	];
+
+	const coreMemories: CoreMemory[] = [
+		{
+			id: 'first-date',
+			title: 'O nosso primeiro date',
+			image: '/core-memories/first-date.jpg',
+			text: 'quando ainda era tudo novo, mas já parecia tão certo.'
+		},
+		{
+			id: 'asking-gf',
+			title: 'O dia em que te pedi em namoro',
+			image: '/core-memories/pedido.jpg',
+			text: 'um dos meus “sim” favoritos de sempre.'
+		},
+		{
+			id: 'first-trip',
+			title: 'A nossa primeira viagem',
+			image: '/core-memories/first-trip.jpg',
+			text: 'a primeira de muitas aventuras juntos.'
+		},
+		{
+			id: 'reunion',
+			title: 'Os nossos reencontros',
+			image: '/core-memories/reunion.jpg',
+			text: 'cada abraço parecia matar meses de saudades.'
+		},
+		{
+			id: 'latest-trip',
+			title: 'A nossa viagem mais recente',
+			image: '/core-memories/latest-trip.jpg',
+			text: 'prova de que a melhor parte ainda está sempre a chegar.'
+		}
+	];
 
 	const journeyPlaces: MapStoryPlace[] = [
 		{
@@ -106,7 +225,7 @@ export default function StoriesApp() {
 				)
 			},
 			{
-				duration: 15000,
+				duration: 17000,
 				songLabel: 'Song name — Artist name',
 				songSrc: '/songs/rituals.mp3',
 				startSecond: 0,
@@ -119,6 +238,60 @@ export default function StoriesApp() {
 					/>
 				)
 			},
+			{
+				duration: 11500,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/stats.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<StatsSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
+				)
+			},
+			{
+				duration: 4000 + coreMemories.length * 6500,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/core-memories.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<CoreMemoriesSlide
+						isPaused={isPaused}
+						songLabel={songLabel ?? ''}
+						memories={coreMemories}
+					/>
+				)
+			},
+			{
+				duration: 17500,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/small-things.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<SmallThingsSlide
+						isPaused={isPaused}
+						songLabel={songLabel ?? ''}
+						things={gabiSmallThings}
+					/>
+				)
+			},
+			{
+				duration: 999999,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/quiz.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<QuizSlide
+						isPaused={isPaused}
+						songLabel={songLabel ?? ''}
+						questions={quizQuestions}
+						onComplete={goNextStory}
+					/>
+				)
+			},
+
 			{
 				duration:
 					4000 +

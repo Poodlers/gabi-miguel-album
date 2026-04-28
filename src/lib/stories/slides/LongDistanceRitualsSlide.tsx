@@ -156,9 +156,7 @@ export default function LongDistanceRitualsSlide({
 
 			<div style={styles.content}>
 				<div ref={titleRef} style={styles.title}>
-					Como fizemos a distância
-					<br />
-					parecer um bocadinho menor
+					Como fizemos a distância parecer um bocadinho menor
 				</div>
 
 				<div style={styles.ritualsLayer}>
@@ -243,7 +241,7 @@ const styles: Record<string, React.CSSProperties> = {
 		zIndex: 2,
 		width: '100%',
 		height: '100%',
-		padding: '86px 20px 30px',
+		padding: '64px 20px 30px',
 		boxSizing: 'border-box',
 		display: 'flex',
 		flexDirection: 'column',
@@ -262,7 +260,7 @@ const styles: Record<string, React.CSSProperties> = {
 	ritualsLayer: {
 		position: 'relative',
 		width: 'min(92vw, 820px)',
-		height: 270,
+		height: 500,
 		marginTop: 38
 	},
 
@@ -285,7 +283,7 @@ const styles: Record<string, React.CSSProperties> = {
 
 	messageCard: {
 		right: 0,
-		bottom: 0
+		top: 200
 	},
 
 	ritualEmoji: {
@@ -306,8 +304,8 @@ const styles: Record<string, React.CSSProperties> = {
 	},
 
 	seriesTitle: {
-		marginTop: 18,
-		marginBottom: 24,
+		marginTop: -16,
+		marginBottom: 18,
 		textAlign: 'center',
 		maxWidth: 760,
 		fontSize: 'clamp(1.2rem, 3vw, 2rem)',
