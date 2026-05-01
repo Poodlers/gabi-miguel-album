@@ -10,7 +10,13 @@ import LongDistanceRitualsSlide from './slides/LongDistanceRitualsSlide';
 import StatsSlide from './slides/StatsSlide';
 import CoreMemoriesSlide, { type CoreMemory } from './slides/CoreMemoriesSlide';
 import QuizSlide, { type QuizQuestion } from './slides/QuizSlide';
+import BeforeAfterSlide, { type BeforeAfterItem } from './slides/BeforeAfterSlide';
 import SmallThingsSlide, { type SmallThing } from './slides/SmallThingsSlide';
+
+import GrowingTogetherSlide from './slides/GrowingTogetherSlide';
+import ClosingDistanceSlide, { type ClosingDistanceConfig } from './slides/ClosingDistanceSlide';
+import FinalMessageSlide from './slides/FinalMessageSlide';
+import FinalWordSlide from './slides/FinalWordSlide';
 
 type StoryAudio = {
 	songLabel?: string;
@@ -33,6 +39,58 @@ export default function StoriesApp() {
 	};
 
 	const audioRef = useRef<HTMLAudioElement | null>(null);
+
+	const closingDistanceConfig: ClosingDistanceConfig = {
+		from: {
+			name: 'Porto',
+			lat: 41.1579,
+			lng: -8.6291
+		},
+		to: {
+			name: 'Stuttgart',
+			lat: 48.7758,
+			lng: 9.1829
+		},
+		you: {
+			name: 'Miguel',
+			image: '/portraits/miguel_foto.jpeg'
+		},
+		her: {
+			name: 'Gabi',
+			image: '/portraits/gabiii.jpg'
+		}
+	};
+
+	const beforeAfterItems: BeforeAfterItem[] = [
+		{
+			id: 'nights',
+			beforeEmoji: '😴',
+			afterEmoji: '📞',
+			before: 'noites eram só noites',
+			after: 'noites passaram a ser chamadas contigo'
+		},
+		{
+			id: 'phone',
+			beforeEmoji: '📱',
+			afterEmoji: '💌',
+			before: 'o telemóvel era só um telemóvel',
+			after: 'passou a ser onde aparecias tu'
+		},
+		{
+			id: 'stories',
+			beforeEmoji: '🙂',
+			afterEmoji: '💬',
+			before: 'viver coisas giras',
+			after: 'pensar logo “tenho de contar isto à Gabi”'
+		},
+		{
+			id: 'travel',
+			beforeEmoji: '🧳',
+			afterEmoji: '❤️',
+			before: 'viajar era conhecer sítios',
+			after: 'viajar passou a ser ir ter contigo'
+		}
+	];
 
 	const gabiSmallThings: SmallThing[] = [
 		{
@@ -214,6 +272,32 @@ export default function StoriesApp() {
 					<TimeAnchorSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
 				)
 			},
+			/*{
+				duration: 999999,
+				songLabel: 'Your soundtrack song — Artist',
+				songSrc: '/songs/soundtrack.mp3',
+				startSecond: 18,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<SoundtrackRankingSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
+				)
+			} */
+			{
+				duration:
+					4000 +
+					journeyPlaces.reduce(
+						(total, place) =>
+							total + 2700 + 850 + 1000 + Math.max(place.photos.length, 1) * 3250 + 1650,
+						0
+					),
+				songLabel: 'Around the World — Daft Punk',
+				songSrc: '/songs/map-song.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<MapJourneySlide isPaused={isPaused} songLabel={songLabel ?? ''} places={journeyPlaces} />
+				)
+			},
 			{
 				duration: 11000,
 				songLabel: 'Song name — Artist name',
@@ -238,6 +322,7 @@ export default function StoriesApp() {
 					/>
 				)
 			},
+
 			{
 				duration: 11500,
 				songLabel: 'Song name — Artist name',
@@ -263,20 +348,6 @@ export default function StoriesApp() {
 				)
 			},
 			{
-				duration: 17500,
-				songLabel: 'Song name — Artist name',
-				songSrc: '/songs/small-things.mp3',
-				startSecond: 0,
-				volume: 0.7,
-				render: ({ isPaused, songLabel }) => (
-					<SmallThingsSlide
-						isPaused={isPaused}
-						songLabel={songLabel ?? ''}
-						things={gabiSmallThings}
-					/>
-				)
-			},
-			{
 				duration: 999999,
 				songLabel: 'Song name — Artist name',
 				songSrc: '/songs/quiz.mp3',
@@ -291,33 +362,84 @@ export default function StoriesApp() {
 					/>
 				)
 			},
-
 			{
-				duration:
-					4000 +
-					journeyPlaces.reduce(
-						(total, place) =>
-							total + 2700 + 850 + 1000 + Math.max(place.photos.length, 1) * 3250 + 1650,
-						0
-					),
-				songLabel: 'Around the World — Daft Punk',
-				songSrc: '/songs/map-song.mp3',
+				duration: 17500,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/small-things.mp3',
 				startSecond: 0,
 				volume: 0.7,
 				render: ({ isPaused, songLabel }) => (
-					<MapJourneySlide isPaused={isPaused} songLabel={songLabel ?? ''} places={journeyPlaces} />
+					<SmallThingsSlide
+						isPaused={isPaused}
+						songLabel={songLabel ?? ''}
+						things={gabiSmallThings}
+					/>
 				)
-			}
-			/*{
-				duration: 999999,
-				songLabel: 'Your soundtrack song — Artist',
-				songSrc: '/songs/soundtrack.mp3',
-				startSecond: 18,
+			},
+			{
+				duration: 4000 + beforeAfterItems.length * 6200,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/before-after.mp3',
+				startSecond: 0,
 				volume: 0.7,
 				render: ({ isPaused, songLabel }) => (
-					<SoundtrackRankingSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
+					<BeforeAfterSlide
+						isPaused={isPaused}
+						songLabel={songLabel ?? ''}
+						items={beforeAfterItems}
+					/>
 				)
-			} */
+			},
+			{
+				duration: 8000,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/growing-together.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<GrowingTogetherSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
+				)
+			},
+			{
+				duration: 18500,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/closing-distance.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<ClosingDistanceSlide
+						isPaused={isPaused}
+						songLabel={songLabel ?? ''}
+						config={closingDistanceConfig}
+					/>
+				)
+			},
+
+			{
+				duration: 14500,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/final-message.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<FinalMessageSlide isPaused={isPaused} songLabel={songLabel ?? ''} />
+				)
+			},
+			{
+				duration: 13000,
+				songLabel: 'Song name — Artist name',
+				songSrc: '/songs/final-word.mp3',
+				startSecond: 0,
+				volume: 0.7,
+				render: ({ isPaused, songLabel }) => (
+					<FinalWordSlide
+						isPaused={isPaused}
+						songLabel={songLabel ?? ''}
+						word="Inseparáveis"
+						whisper="para sempre."
+					/>
+				)
+			}
 		],
 		[isPaused]
 	);
